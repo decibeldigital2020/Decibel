@@ -1,0 +1,2 @@
+export const ENDPOINT_ISSUE_LIST_LAMBDA = "https://hg0yi3q9vb.execute-api.us-east-1.amazonaws.com/production/issuelist";
+export const ENDPOINT_RESOURCE_LAMBDA = "https://f5md774521.execute-api.us-east-1.amazonaws.com/production/resource";
