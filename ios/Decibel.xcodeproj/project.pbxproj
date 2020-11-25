@@ -20,6 +20,7 @@
 		75D8AF5B9F595B23F0D6E2EE /* libPods-Decibel-DecibelTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 46E69E34046C92F5DAC5D0C8 /* libPods-Decibel-DecibelTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		BDA2641E3A453350B2329AED /* libPods-Decibel-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D53E12D2A4D635FCC47201E /* libPods-Decibel-tvOS.a */; };
+		8C44E899848645D885A5BBEE /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FFDBC961DB834016B53B2ECC /* Ionicons.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +68,7 @@
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 		FA680B1CCBE7EB76FA77A580 /* Pods-Decibel-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Decibel-tvOS.release.xcconfig"; path = "Target Support Files/Pods-Decibel-tvOS/Pods-Decibel-tvOS.release.xcconfig"; sourceTree = "<group>"; };
+		FFDBC961DB834016B53B2ECC /* Ionicons.ttf */ = {isa = PBXFileReference; name = "Ionicons.ttf"; path = "../node_modules/react-native-ionicons/fonts/Ionicons.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -181,6 +183,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				0E4F503B0F739B9EB998839B /* Pods */,
+				BF531C5DB9614A38B546E02B /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -197,6 +200,15 @@
 			);
 			name = Products;
 			sourceTree = "<group>";
+		};
+		BF531C5DB9614A38B546E02B /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				FFDBC961DB834016B53B2ECC /* Ionicons.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -343,6 +355,7 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				8C44E899848645D885A5BBEE /* Ionicons.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

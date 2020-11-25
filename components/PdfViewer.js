@@ -1,24 +1,19 @@
 import React from 'react';
 import PDFView from 'react-native-view-pdf/lib/index';
-import { View, Text } from "react-native" ;
 
-const resources = {
-  url: 'http://www.africau.edu/images/default/sample.pdf'
+const PdfViewer = ({ resource }) => {
+
+    const splitPath = resource.split("/");
+    const filename = resource;//splitPath[splitPath.length - 1];
+
+    return <PDFView
+        fadeInDuration={0}
+        style={{ flex: 1 }}
+        resource={filename}
+        resourceType={"file"}
+        onLoad={() => console.log(`PDF rendered from file`)}
+        onError={(error) => console.log('Cannot render PDF', filename, error)}
+    />;
 };
 
-export default class PdfViewer extends React.Component {
-  render() {
-    const resourceType = 'url';
-    console.log("test")
-    return (
-        <PDFView
-          fadeInDuration={0}
-          style={{ flex: 1 }}
-          resource={resources[resourceType]}
-          resourceType={resourceType}
-          onLoad={() => console.log(`PDF rendered from ${resourceType}`)}
-          onError={(error) => console.log('Cannot render PDF', error)}
-        />
-    );
-  }
-}
+export default PdfViewer;

@@ -1,15 +1,22 @@
 import React from 'react';
 import {
     ActivityIndicator,
+    Animated,
+    Button,
+    Easing,
     FlatList,
     StyleSheet,
     Text,
+    TouchableOpacity,
     View
 } from 'react-native';
 import { connect } from 'react-redux';
 import { getIssueList } from '../actions/issueListActions';
+import Icon from 'react-native-ionicons';
+import IssueListItem from './IssueListItem';
 
-const IssueList = ({ getIssueList, issueList, requestingIssueList }) => {
+// TODO: Refresh on re-open app
+const IssueList = ({ getIssueList, issueList, navigation, requestingIssueList }) => {
 
     React.useEffect(() => {
         if (!issueList && !requestingIssueList) {
@@ -17,24 +24,13 @@ const IssueList = ({ getIssueList, issueList, requestingIssueList }) => {
         }
     }, []);
 
-    const renderIssueListItem = (issue) =>
-        <View style={styles.issueListItem}>
-            <View style={styles.issueNumberContainer}>
-                <Text style={styles.issueNumber}>{ issue.item.issue_number.toString() }</Text>
-            </View>
-            <View style={styles.issueInfoContainer}>
-                <Text style={styles.displayDate}>{ issue.item.display_date }</Text>
-                <Text style={styles.issueName}>{ issue.item.issue_name }</Text>
-            </View>
-        </View>;
-
     return (
         <View style={styles.container}>
             { issueList && !requestingIssueList && 
                 <FlatList
                     style={styles.issueList}
                     data={issueList.issues}
-                    renderItem={renderIssueListItem}
+                    renderItem={(issue) => <IssueListItem issue={issue.item} navigation={navigation} />}
                     keyExtractor={issue => issue.issue_number.toString()}
                     showsVerticalScrollIndicator={false}
                 />
@@ -51,6 +47,10 @@ const IssueList = ({ getIssueList, issueList, requestingIssueList }) => {
     );
 }
 
+const styleConstants = {
+    buttonColor: "#FFF"
+}
+
 const styles = StyleSheet.create({
     activityIndicator: {
         flex: 1,
@@ -59,39 +59,11 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        backgroundColor: "#CCCCCC"
-    },
-    displayDate: {
-        fontWeight: "300"
-    },
-    issueInfoContainer: {
-        flex: 1,
-        flexDirection: "column"
+        backgroundColor: "#CCC"
     },
     issueList: {
         marginHorizontal: 16,
         marginTop: 16
-    },
-    issueListItem: {
-        color: "#FF0000",
-        backgroundColor: "#FFFFFF",
-        borderRadius: 5,
-        padding: 8,
-        paddingLeft: 20,
-        flexDirection: "row",
-        justifyContent: "flex-start",
-        marginVertical: 4
-    },
-    issueName: {
-        fontWeight: "500"
-    },
-    issueNumberContainer: {
-        flex: 1,
-        flexDirection: "column",
-        justifyContent: "center",
-        maxWidth: 40
-    },
-    issueNumber: {
     }
 });
 

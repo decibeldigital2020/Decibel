@@ -31,7 +31,7 @@ export const getIssueList = () => (dispatch) => {
                     message: getIssueListErrorMessage
                 }
             });
-            return;
+            throw new Error(response);
         } else {
             return response.json();
         }

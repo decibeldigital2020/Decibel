@@ -1,10 +1,7 @@
 /**
  * Decibel magazine app for iOs
- *
- * @format
- * @flow strict-local
  */
-
+import 'react-native-gesture-handler';
 import React from 'react';
 import {
   SafeAreaView,
@@ -14,22 +11,41 @@ import {
   Text,
   StatusBar,
 } from 'react-native';
-import IssueList from './components/IssueList';
 import { Provider } from 'react-redux';
 import reducer from './reducer';
 import { applyMiddleware, createStore } from 'redux';
 import thunk from "redux-thunk";
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import IssueList from './components/IssueList';
+import PreviewIssue from './components/PreviewIssue';
 
+const Stack = createStackNavigator();
 const store = createStore(reducer, applyMiddleware(thunk));
 
 const App = () => {
   return (
-    <Provider store={store}>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView style={styles.container}>
-          <IssueList />
-      </SafeAreaView>
-    </Provider>
+    <NavigationContainer>
+      <Provider store={store}>
+        <StatusBar barStyle="dark-content" />
+        <SafeAreaView style={styles.container}>
+          <Stack.Navigator>
+            <Stack.Screen 
+              name="IssueList" 
+              component={IssueList}
+              options={{
+                title: "Issues"
+              }} />
+            <Stack.Screen 
+              name="PreviewIssue" 
+              component={PreviewIssue}
+              options={{
+                title: "Preview"
+              }} />
+          </Stack.Navigator>
+        </SafeAreaView>
+      </Provider>
+    </NavigationContainer>
   );
 };
 
