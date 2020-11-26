@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import Icon from 'react-native-ionicons';
+import IssueHero from './IssueHero';
 
 const IssueListItem = ({ issue, navigation, selectIssue }) => {
 
@@ -60,6 +61,7 @@ const IssueListItem = ({ issue, navigation, selectIssue }) => {
                     setAccordionLeftOffset(event.nativeEvent.layout.width * .05);
                 }
                 }>
+                <IssueHero uploadTimestamp={issue.upload_timestamp} visible={accordionOpen} />
                 <View style={styles.accordionButton}>
                     <Button 
                         color={styleConstants.buttonColor}

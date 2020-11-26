@@ -32,5 +32,3 @@ target 'Decibel-tvOS' do
     # Pods for testing
   end
 end
-
-pod 'RNPDF', :path => '../node_modules/react-native-view-pdf'

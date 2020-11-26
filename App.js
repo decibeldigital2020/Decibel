@@ -19,31 +19,44 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import IssueList from './components/IssueList';
 import PreviewIssue from './components/PreviewIssue';
+import { PersistGate } from 'redux-persist/integration/react';
+import { persistStore, persistReducer } from 'redux-persist';
+import AsyncStorage from '@react-native-community/async-storage';
+
+const persistedReducerConfig = {
+  key: 'root',
+  storage: AsyncStorage
+};
+const persistedReducer = persistReducer(persistedReducerConfig, reducer);
+const store = createStore(persistedReducer, applyMiddleware(thunk));
+const persistor = persistStore(store);
+persistor.purge();
 
 const Stack = createStackNavigator();
-const store = createStore(reducer, applyMiddleware(thunk));
 
 const App = () => {
   return (
     <NavigationContainer>
       <Provider store={store}>
-        <StatusBar barStyle="dark-content" />
-        <SafeAreaView style={styles.container}>
-          <Stack.Navigator>
-            <Stack.Screen 
-              name="IssueList" 
-              component={IssueList}
-              options={{
-                title: "Issues"
-              }} />
-            <Stack.Screen 
-              name="PreviewIssue" 
-              component={PreviewIssue}
-              options={{
-                title: "Preview"
-              }} />
-          </Stack.Navigator>
-        </SafeAreaView>
+        <PersistGate loading={null} persistor={persistor}>
+          <StatusBar barStyle="dark-content" />
+          <SafeAreaView style={styles.container}>
+            <Stack.Navigator>
+              <Stack.Screen 
+                name="IssueList" 
+                component={IssueList}
+                options={{
+                  title: "Issues"
+                }} />
+              <Stack.Screen 
+                name="PreviewIssue" 
+                component={PreviewIssue}
+                options={{
+                  title: "Preview"
+                }} />
+            </Stack.Navigator>
+          </SafeAreaView>
+        </PersistGate>
       </Provider>
     </NavigationContainer>
   );

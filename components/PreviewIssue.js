@@ -4,7 +4,7 @@ import { ProgressView } from "@react-native-community/progress-view";
 import { connect } from 'react-redux';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { getPreviewPdfFilename, getResource as getResourceAction } from '../actions/fileRetrievalActions';
-import { FILE_CACHE_STATUS, RESOURCE_TYPE } from '../constants';
+import { FILE_RETRIEVAL_STATUS, RESOURCE_TYPE } from '../constants';
 import { styleConstants } from '../constants/styles';
 import ErrorHelperText from './ErrorHelperText';
 
@@ -22,27 +22,27 @@ const PreviewIssue = ({ fileCacheMap, getResource, selectedIssue }) => {
         }
     }, [selectedIssue]);
 
-    console.log("fileCacheMap", fileCacheMap);
+    //console.log("fileCacheMap", fileCacheMap);
 
     if (!fileCacheMap[filename]) {
         return null;
     }
 
     return <View style={styles.container}>
-        { fileCacheMap[filename].status === FILE_CACHE_STATUS.COMPLETED &&
+        { fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.COMPLETED &&
             <PdfViewer resource={fileCacheMap[filename].localPath} />
         }
-        { fileCacheMap[filename].status === FILE_CACHE_STATUS.REQUESTED &&
+        { fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.REQUESTED &&
             <ActivityIndicator size={"large"} color={styleConstants.activityIndicator.color} />
         }
-        { fileCacheMap[filename].status === FILE_CACHE_STATUS.IN_PROGRESS &&
+        { fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.IN_PROGRESS &&
             <ProgressView
                 progressTintColor="orange"
                 trackTintColor="blue"
                 progress={fileCacheMap[filename].progress}
             />
         }
-        { fileCacheMap[filename].status === FILE_CACHE_STATUS.FAILED &&
+        { fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.FAILED &&
             <Text>There was a problem fetching the file. Try again in a few minutes. <ErrorHelperText /></Text>
         }
     </View>;

@@ -1,18 +1,22 @@
 import React from 'react';
-import PDFView from 'react-native-view-pdf/lib/index';
+import Pdf from 'react-native-pdf';
 
 const PdfViewer = ({ resource }) => {
 
-    const splitPath = resource.split("/");
-    const filename = resource;//splitPath[splitPath.length - 1];
+    const source = { uri: resource };
 
-    return <PDFView
-        fadeInDuration={0}
+    return <Pdf
+        source={source}
         style={{ flex: 1 }}
-        resource={filename}
-        resourceType={"file"}
-        onLoad={() => console.log(`PDF rendered from file`)}
-        onError={(error) => console.log('Cannot render PDF', filename, error)}
+        onLoadComplete={(numberOfPages, filePath) => {
+            //console.log(`number of pages: ${numberOfPages}`);
+        }}
+        onPageChanged={(page,numberOfPages) => {
+            //console.log(`current page: ${page}`);
+        }}
+        onError={(error) => {
+            //console.log(error);
+        }}
     />;
 };
 
