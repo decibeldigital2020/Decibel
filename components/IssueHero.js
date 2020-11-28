@@ -3,7 +3,9 @@ import { connect } from 'react-redux';
 import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
 import { 
     getHeroFilename, 
-    presignedUrlIsAlive, 
+    presignedUrlIsAlive
+} from '../util/fileRetrievalUtil';
+import {
     getResourceFromUrl as getResourceFromUrlAction,
     getResource as getResourceAction 
 } from '../actions/fileRetrievalActions';
@@ -18,7 +20,6 @@ const IssueHero = ({fileCacheMap, fileLinkMap, getResource, getResourceFromUrl, 
     const filename = getHeroFilename(uploadTimestamp);
 
     React.useEffect(() => {
-        console.log(uploadTimestamp, visible, fileCacheMap[filename])
         if (!visible) {
             return;
         }
@@ -36,14 +37,10 @@ const IssueHero = ({fileCacheMap, fileLinkMap, getResource, getResourceFromUrl, 
         }
     }, [fileCacheMap, fileLinkMap, uploadTimestamp, visible]);
 
-    //console.log("fileCacheMap", fileCacheMap);
-    //console.log("fileLinkMap", fileLinkMap);
-    //console.log(fileCacheMap[filename].localPath);
-
     if (!fileCacheMap[filename]) {
         return null;
     }
-    
+
     return <View style={styles.container}>
         { fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.COMPLETED &&
             <Image 
@@ -58,7 +55,10 @@ const IssueHero = ({fileCacheMap, fileLinkMap, getResource, getResourceFromUrl, 
             <ActivityIndicator size={"large"} color={styleConstants.activityIndicator.color} />
         }
         { fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.FAILED &&
-            <Text>There was a problem fetching this image. Try again in a few minutes. <ErrorHelperText /></Text>
+            <Text style={styles.errorText}>
+                There was a problem fetching this image. Try again in a few minutes. 
+                <ErrorHelperText />
+            </Text>
         }
     </View>;
 };
@@ -66,7 +66,12 @@ const IssueHero = ({fileCacheMap, fileLinkMap, getResource, getResourceFromUrl, 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 6
+        justifyContent: "center",
+        maxWidth: HERO_IMAGE_SCALE,
+        height: HERO_IMAGE_SCALE * 1.34
+    },
+    errorText: {
+        padding: 4
     },
     heroImage: {
         width: HERO_IMAGE_SCALE,

@@ -1,5 +1,6 @@
 import React from 'react';
 import Pdf from 'react-native-pdf';
+import { StyleSheet } from 'react-native';
 
 const PdfViewer = ({ resource }) => {
 
@@ -7,7 +8,7 @@ const PdfViewer = ({ resource }) => {
 
     return <Pdf
         source={source}
-        style={{ flex: 1 }}
+        style={styles.container}
         onLoadComplete={(numberOfPages, filePath) => {
             //console.log(`number of pages: ${numberOfPages}`);
         }}
@@ -19,5 +20,12 @@ const PdfViewer = ({ resource }) => {
         }}
     />;
 };
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: "#000"
+    }
+});
 
 export default PdfViewer;

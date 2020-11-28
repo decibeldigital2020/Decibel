@@ -30,7 +30,9 @@ const persistedReducerConfig = {
 const persistedReducer = persistReducer(persistedReducerConfig, reducer);
 const store = createStore(persistedReducer, applyMiddleware(thunk));
 const persistor = persistStore(store);
-persistor.purge();
+if(__DEV__) {
+  persistor.purge();
+}
 
 const Stack = createStackNavigator();
 

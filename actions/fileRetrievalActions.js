@@ -1,92 +1,43 @@
-import { ENDPOINT_RESOURCE_LAMBDA, RESOURCE_TYPE, MAX_PRESIGNED_URL_AGE } from '../constants';
+import { ENDPOINT_RESOURCE_LAMBDA } from '../constants';
 import RNFetchBlob from 'rn-fetch-blob';
+import {
+    getPreviewPdfFilename,
+    getPreviewImageFilename,
+    getHeroFilename,
+    getIssueFilename,
+    getFilenameByResourceType,
+    presignedUrlIsAlive,
+    getFilenameFromUrl
+} from '../util/fileRetrievalUtil';
 
 const getResourceErrorMessage = "There was a problem downloading the requested item. Please try again in a few minutes.";
-
-export const getPreviewPdfFilename = uploadTimestamp => `${uploadTimestamp}_preview.pdf`;
-export const getPreviewImageFilename = (uploadTimestamp, page) => `${uploadTimestamp}_preview-${page}.jpg`;
-export const getHeroFilename = uploadTimestamp => `${uploadTimestamp}_hero-0.jpg`;
-export const getIssueFilename = uploadTimestamp => `${uploadTimestamp}.pdf`;
-
-export const getFilenameByResourceType = (uploadTimestamp, resourceType, page) => {
-    switch (resourceType) {
-        case RESOURCE_TYPE.HERO: {
-            return getHeroFilename(uploadTimestamp);
-        }
-        case RESOURCE_TYPE.ISSUE: {
-            return getIssueFilename(uploadTimestamp);
-        }
-        case RESOURCE_TYPE.PREVIEW_IMG: {
-            return getPreviewImageFilename(uploadTimestamp, page);
-        }
-        case RESOURCE_TYPE.PREVIEW_PDF: {
-            return getPreviewPdfFilename(uploadTimestamp);
-        }
-    }
+const headers = {
+    'Content-Type': 'application/json'
 };
 
-export const presignedUrlIsAlive = (requestedTimestamp) =>
-    (requestedTimestamp + MAX_PRESIGNED_URL_AGE) <= Date.now();
+const PROGRESS_FACTOR = 100;
 
-
-export const getFilenameFromUrl = (url) => {
-    const regex = /\/[0-9]+(_[a-zA-Z0-9-]+){0,1}\.[a-zA-Z]{3}\?/gm;
-    const result = url.match(regex);
-    return result && result[0].slice(1, result[0].length - 1);
-}
-
-export const getResourceLink = (uploadTimestamp, resourceType, page) => dispatch => {
-    let filename = getFilenameByResourceType(uploadTimestamp, resourceType);
-    let data = {
-        resource_type: resourceType,
-        resource_name: uploadTimestamp
-    };
-    if (page) {
-        data.page = page;
-    }
-    //console.log("Fetching link " + ENDPOINT_RESOURCE_LAMBDA, data, filename);
-    dispatch({ type: "REQUEST_FILE_LINK", payload: { filename } });
-    fetch(ENDPOINT_RESOURCE_LAMBDA, {
-        body: JSON.stringify(data),
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        method: "POST"
-    }).then(response => {
-        //console.log("Received response", response);
-        if (response.status !== 200) {
-            //console.log("Status not 200", response.status);
-            throw new Error(response);
+const failFileCache = (err, dispatch, filename) => {
+    console.error("Error fetching resource", err);
+    dispatch({ type: "FAIL_FILE_CACHE", payload: { filename }});
+    dispatch({
+        type: "ERROR",
+        payload: {
+            message: getResourceErrorMessage
         }
-        return response.json();
-    }).then(responseJson => {
-        //console.log("Response json", responseJson);
-        if (!responseJson.url) {
-            //console.log("No url in response");
-            throw new Error(responseJson);
-        }
-        dispatch({
-            type: "COMPLETE_FILE_LINK",
-            payload: {
-                filename,
-                url: responseJson.url
-            }
-        });
-    }).catch(err => {
-        //console.log("Error fetching resource link", err);
-        dispatch({ type: "FAIL_FILE_LINK", payload: { filename }});
     });
 }
 
-export const getResourceFromLink = (url) => dispatch => {
-    let filename = getFilenameFromUrl(url);
+const getFilePath = (filename) => (RNFetchBlob.fs.dirs.DocumentDir + "/" + filename);
+
+const fetchResource = (dispatch, filename, url) => {
     let dirs = RNFetchBlob.fs.dirs;
     dispatch({ type: "REQUEST_FILE_CACHE", payload: { filename } });
-    RNFetchBlob.config({
-        path : dirs.DocumentDir + "/" + filename
+    return RNFetchBlob.config({
+        path : getFilePath(filename)
     })
     .fetch('GET', url)
-    .progress({ count : 10 }, (received, total) => {
+    .progress({ count : PROGRESS_FACTOR }, (received, total) => {
         //console.log('progress', received / total);
         dispatch({
             type: "IN_PROGRESS_FILE_CACHE",
@@ -105,16 +56,53 @@ export const getResourceFromLink = (url) => dispatch => {
                 localPath: resourceResponse.path()
             }
         });
-    }).catch(err => {
-        //console.log("Error fetching resource", err);
-        dispatch({ type: "FAIL_FILE_CACHE", payload: { filename }});
+    }).catch(err => failFileCache(err, dispatch, filename));    
+}
+
+export const getResourceLink = (uploadTimestamp, resourceType, page) => dispatch => {
+    let filename = getFilenameByResourceType(uploadTimestamp, resourceType);
+    let data = {
+        resource_type: resourceType,
+        resource_name: uploadTimestamp
+    };
+    if (page) {
+        data.page = page;
+    }
+    //console.log("Fetching link " + ENDPOINT_RESOURCE_LAMBDA, data, filename);
+    dispatch({ type: "REQUEST_FILE_LINK", payload: { filename } });
+    fetch(ENDPOINT_RESOURCE_LAMBDA, {
+        body: JSON.stringify(data),
+        headers,
+        method: "POST"
+    }).then(response => {
+        //console.log("Received response", response);
+        if (response.status !== 200) {
+            console.error("Status not 200", response.status);
+            throw new Error(response);
+        }
+        return response.json();
+    }).then(responseJson => {
+        //console.log("Response json", responseJson);
+        if (!responseJson.url) {
+            console.error("No url in response");
+            throw new Error(responseJson);
+        }
         dispatch({
-            type: "ERROR",
+            type: "COMPLETE_FILE_LINK",
             payload: {
-                message: getResourceErrorMessage
+                filename,
+                url: responseJson.url
             }
         });
+    }).catch(err => {
+        console.error("Error fetching resource link", err);
+        dispatch({ type: "FAIL_FILE_LINK", payload: { filename }});
     });
+}
+
+export const getResourceFromLink = (url) => dispatch => {
+    let filename = getFilenameFromUrl(url);
+    fetchResource(dispatch, filename, url);
 }
 
 export const getResource = (uploadTimestamp, resourceType, page) => dispatch => {
@@ -130,56 +118,33 @@ export const getResource = (uploadTimestamp, resourceType, page) => dispatch => 
     dispatch({ type: "REQUEST_FILE_CACHE", payload: { filename } });
     fetch(ENDPOINT_RESOURCE_LAMBDA, {
         body: JSON.stringify(data),
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers,
         method: "POST"
     }).then(response => {
         //console.log("Received response", response);
         if (response.status !== 200) {
-            //console.log("Status not 200", response.status);
+            console.error("Status not 200", response.status);
             throw new Error(response);
         }
         return response.json();
     }).then(responseJson => {
         //console.log("Response json", responseJson);
         if (!responseJson.url) {
-            //console.log("No url in response");
+            console.error("No url in response");
             throw new Error(responseJson);
         }
-        let dirs = RNFetchBlob.fs.dirs;
-        RNFetchBlob.config({
-            path : dirs.DocumentDir + "/" + filename
-        })
-        .fetch('GET', responseJson.url)
-        .progress({ count : 10 }, (received, total) => {
-            //console.log('progress', received / total);
+        let url = responseJson.url;
+        fetchResource(dispatch, filename, url);
+    }).catch(err => failFileCache(err, dispatch, filename));
+}
+
+export const removeResource = (filename) => dispatch => {
+    RNFetchBlob.fs.unlink(getFilePath(filename))
+        .then(() => {
             dispatch({
-                type: "IN_PROGRESS_FILE_CACHE",
-                payload: {
-                    filename,
-                    progress: (received / total)
-                }
+                type: "REMOVE_FILE_CACHE",
+                payload: { filename }
             });
         })
-        .then((resourceResponse) => {
-            //console.log('Got resource response', resourceResponse);
-            dispatch({
-                type: "COMPLETE_FILE_CACHE",
-                payload: {
-                    filename,
-                    localPath: resourceResponse.path()
-                }
-            });
-        })
-    }).catch(err => {
-        //console.log("Error fetching resource", err);
-        dispatch({ type: "FAIL_FILE_CACHE", payload: { filename }});
-        dispatch({
-            type: "ERROR",
-            payload: {
-                message: getResourceErrorMessage
-            }
-        });
-    });
-} 
+        .catch(err => failFileCache(err, dispatch, filename));
+}

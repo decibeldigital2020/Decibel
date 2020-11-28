@@ -18,7 +18,6 @@ import { MAX_ISSUE_LIST_AGE } from '../constants';
 
 const issueListIsAlive = issueListRequestedTimestamp => (issueListRequestedTimestamp + MAX_ISSUE_LIST_AGE) >= Date.now();
 
-// TODO: Refresh on re-open app
 const IssueList = ({ getIssueList, issueList, issueListRequestedTimestamp, navigation, requestingIssueList }) => {
 
     React.useEffect(() => {
@@ -36,7 +35,12 @@ const IssueList = ({ getIssueList, issueList, issueListRequestedTimestamp, navig
                     data={issueList.issues}
                     onRefresh={() => getIssueList()}
                     refreshing={requestingIssueList}
-                    renderItem={(issue) => <IssueListItem issue={issue.item} navigation={navigation} />}
+                    renderItem={(issue) => 
+                        <IssueListItem 
+                            controlAccordion={[0, 1, 2].map(i => issueList.issues[i].product_id).includes(issue.item.product_id)}
+                            issue={issue.item} 
+                            navigation={navigation} 
+                            />}
                     keyExtractor={issue => issue.issue_number.toString()}
                     showsVerticalScrollIndicator={false}
                 />
