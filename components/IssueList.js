@@ -15,6 +15,7 @@ import { getIssueList } from '../actions/issueListActions';
 import Icon from 'react-native-ionicons';
 import IssueListItem from './IssueListItem';
 import { MAX_ISSUE_LIST_AGE } from '../constants';
+import BottomNavigation from './BottomNavigation';
 
 const issueListIsAlive = issueListRequestedTimestamp => (issueListRequestedTimestamp + MAX_ISSUE_LIST_AGE) >= Date.now();
 
@@ -28,7 +29,6 @@ const IssueList = ({ getIssueList, issueList, issueListRequestedTimestamp, navig
 
     return (
         <View style={styles.container}>
-
             { issueList && 
                 <FlatList
                     style={styles.issueList}
@@ -45,6 +45,7 @@ const IssueList = ({ getIssueList, issueList, issueListRequestedTimestamp, navig
                     showsVerticalScrollIndicator={false}
                 />
             }
+            <BottomNavigation navigation={navigation} />
         </View>
     );
 }
@@ -61,11 +62,11 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        backgroundColor: "#000"
+        backgroundColor: "#000",
+        flexDirection: "column"
     },
     issueList: {
-        marginHorizontal: 16,
-        marginTop: 16
+        marginHorizontal: 16
     }
 });
 

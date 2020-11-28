@@ -12,6 +12,7 @@ import { connect } from 'react-redux';
 import Icon from 'react-native-ionicons';
 import IssueHero from './IssueHero';
 import { ACCORDION_DURATION, ISSUE_LIST_DESCRIPTION_LENGTH } from "../constants";
+import { styleConstants } from '../constants/styles';
 
 const IssueListItem = ({ controlAccordion, issue, navigation, selectIssue }) => {
 
@@ -51,11 +52,11 @@ const IssueListItem = ({ controlAccordion, issue, navigation, selectIssue }) => 
             </View>
             <View style={styles.issueTitleContainer}>
                 <Text style={styles.displayDate}>{ issue.display_date }</Text>
-                <Text style={[styles.issueName, {color: accordionOpen ? styleConstants.selectedIssueNameColor : styleConstants.issueNameColor}]}>{ issue.issue_name }</Text>
+                <Text style={[styles.issueName, {color: accordionOpen ? styleConstants.selectedIssueName.color : styleConstants.issueName.color}]}>{ issue.issue_name }</Text>
             </View>
             <View style={styles.openAccordionIcon}>
-                { !accordionOpen && <Icon name="arrow-down" color="#000" /> }
-                { accordionOpen && <Icon name="arrow-up" color="#000" /> }
+                { !accordionOpen && <Icon name="arrow-down" color={styleConstants.icon.color} /> }
+                { accordionOpen && <Icon name="arrow-up" color={styleConstants.icon.color} /> }
             </View>
         </TouchableOpacity>
         <Animated.View 
@@ -74,7 +75,7 @@ const IssueListItem = ({ controlAccordion, issue, navigation, selectIssue }) => 
                 <View style={styles.issueDetailsContainer}>
                     <View style={styles.purchaseIssueButton}>
                         <Button 
-                            color={styleConstants.buttonColor}
+                            color={styleConstants.button.color}
                             title={"$4.99"}
                             onPress={() => {
                                 selectIssue(issue.product_id);
@@ -83,7 +84,7 @@ const IssueListItem = ({ controlAccordion, issue, navigation, selectIssue }) => 
                     </View>
                     <View style={styles.previewIssueButton}>
                         <Button 
-                            color={styleConstants.buttonColor}
+                            color={styleConstants.button.color}
                             title={"Preview Issue"}
                             onPress={() => {
                                 selectIssue(issue.product_id);
@@ -98,12 +99,6 @@ const IssueListItem = ({ controlAccordion, issue, navigation, selectIssue }) => 
             </View>
         </Animated.View>
     </View>;
-}
-
-const styleConstants = {
-    buttonColor: "#FFF",
-    selectedIssueNameColor: "#F00",
-    issueNameColor: "#000"
 }
 
 const styles = StyleSheet.create({

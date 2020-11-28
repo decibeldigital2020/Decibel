@@ -4,6 +4,7 @@
 import 'react-native-gesture-handler';
 import React from 'react';
 import {
+  Image,
   SafeAreaView,
   StyleSheet,
   ScrollView,
@@ -22,6 +23,8 @@ import PreviewIssue from './components/PreviewIssue';
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistStore, persistReducer } from 'redux-persist';
 import AsyncStorage from '@react-native-community/async-storage';
+import decibelLogoHeaderImage from './img/decibel-header-logo.png';
+import { styleConstants } from './constants/styles';
 
 const persistedReducerConfig = {
   key: 'root',
@@ -36,19 +39,37 @@ if(__DEV__) {
 
 const Stack = createStackNavigator();
 
+const headerStyle = {
+  backgroundColor: styleConstants.statusBar.backgroundColor
+};
+const headerTintColor = styleConstants.statusBar.color;
+const headerTitleStyle = {
+  fontWeight: "500"
+};
+
+const LogoTitle = () => {
+  return <Image source={decibelLogoHeaderImage} style={styles.decibelLogoHeaderImage} />
+}
+
 const App = () => {
   return (
     <NavigationContainer>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <StatusBar barStyle="dark-content" />
           <SafeAreaView style={styles.container}>
-            <Stack.Navigator>
+            <StatusBar barStyle="light-content" backgroundColor={styleConstants.statusBar.backgroundColor} />
+            <Stack.Navigator
+              screenOptions={{
+                headerStyle,
+                headerTintColor,
+                headerTitleStyle
+              }}>
               <Stack.Screen 
                 name="IssueList" 
                 component={IssueList}
                 options={{
-                  title: "Issues"
+                  title: "Issues",
+                  headerTitle: props => <LogoTitle {...props} />
                 }} />
               <Stack.Screen 
                 name="PreviewIssue" 
@@ -67,7 +88,12 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    width: "100%"
+    width: "100%",
+    backgroundColor: "#000"
+  },
+  decibelLogoHeaderImage: {
+    width: 96,
+    height: 16
   }
 });
 

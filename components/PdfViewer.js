@@ -7,6 +7,7 @@ const PdfViewer = ({ resource }) => {
     const source = { uri: resource };
 
     return <Pdf
+        horizontal={true}
         source={source}
         style={styles.container}
         onLoadComplete={(numberOfPages, filePath) => {
