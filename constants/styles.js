@@ -1,12 +1,12 @@
 export const styleConstants = {
+    actionButton: {
+        color: "#D44"
+    },
     activityIndicator: {
         color: "#000"
     },
     button: {
         color: "#FFF"
-    },
-    selectedIssueName: {
-        color: "#F00"
     },
     issueName: {
         color: "#000"
@@ -22,6 +22,9 @@ export const styleConstants = {
     },
     iconMedium: {
         color: "#555"
+    },
+    selectedIssueName: {
+        color: "#F00"
     },
     statusBar: {
         backgroundColor: "#000",

@@ -87,7 +87,10 @@ const reducer = (state = initialState, action) => {
         // File cache actions
         case "REQUEST_FILE_CACHE": {
             newState.fileCacheMap = Object.assign({}, newState.fileCacheMap);
-            newState.fileCacheMap[action.payload.filename] = { status: FILE_RETRIEVAL_STATUS.REQUESTED };
+            newState.fileCacheMap[action.payload.filename] = { 
+                status: FILE_RETRIEVAL_STATUS.REQUESTED,
+                task: action.payload.task
+            };
             return newState;
         }
         case "COMPLETE_FILE_CACHE": {
@@ -107,7 +110,9 @@ const reducer = (state = initialState, action) => {
         }
         case "IN_PROGRESS_FILE_CACHE": {
             newState.fileCacheMap = Object.assign({}, newState.fileCacheMap);
+            let newCacheEntry = Object.assign({}, newState.fileCacheMap[action.payload.filename]);
             newState.fileCacheMap[action.payload.filename] = {
+                ...newCacheEntry,
                 status: FILE_RETRIEVAL_STATUS.IN_PROGRESS,
                 progress: action.payload.progress
             }

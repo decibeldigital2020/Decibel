@@ -7,17 +7,13 @@ const PdfViewer = ({ resource }) => {
     const source = { uri: resource };
 
     return <Pdf
+        enablePaging={false}
         horizontal={true}
         source={source}
+        spacing={0}
         style={styles.container}
-        onLoadComplete={(numberOfPages, filePath) => {
-            //console.log(`number of pages: ${numberOfPages}`);
-        }}
-        onPageChanged={(page,numberOfPages) => {
-            //console.log(`current page: ${page}`);
-        }}
         onError={(error) => {
-            //console.log(error);
+            console.error(error);
         }}
     />;
 };

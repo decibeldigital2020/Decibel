@@ -18,6 +18,10 @@ const BottomNavigation = ({navigation}) => {
             <Text style={styles.iconLabelText}>Downloads</Text>
         </View>
         <View style={styles.iconContainer}>
+            <Icon name="paper" color={styleConstants.iconMedium.color} style={styles.icon} />
+            <Text style={styles.iconLabelText}>Library</Text>
+        </View>
+        <View style={styles.iconContainer}>
             <Icon name="help-circle" color={styleConstants.iconMedium.color} style={styles.icon} />
             <Text style={styles.iconLabelText}>Help</Text>
         </View>

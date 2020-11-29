@@ -63,7 +63,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#000",
-        flexDirection: "column"
+        flexDirection: "column",
+        justifyContent: "flex-end"
     },
     issueList: {
         marginHorizontal: 16

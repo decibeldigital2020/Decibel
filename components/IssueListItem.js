@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+    ActivityIndicator,
     Animated,
     Button,
     Easing,
@@ -11,10 +12,17 @@ import {
 import { connect } from 'react-redux';
 import Icon from 'react-native-ionicons';
 import IssueHero from './IssueHero';
-import { ACCORDION_DURATION, ISSUE_LIST_DESCRIPTION_LENGTH } from "../constants";
+import { 
+    ACCORDION_DURATION, 
+    FILE_RETRIEVAL_STATUS,
+    ISSUE_LIST_DESCRIPTION_LENGTH, 
+    RESOURCE_TYPE 
+} from "../constants";
 import { styleConstants } from '../constants/styles';
+import { getResource as getResourceAction } from '../actions/fileRetrievalActions';
+import { getIssueFilename } from '../util/fileRetrievalUtil';
 
-const IssueListItem = ({ controlAccordion, issue, navigation, selectIssue }) => {
+const IssueListItem = ({ controlAccordion, fileCacheMap, getResource, issue, navigation, selectIssue }) => {
 
     if (!issue) {
         return null;
@@ -45,6 +53,8 @@ const IssueListItem = ({ controlAccordion, issue, navigation, selectIssue }) => 
         setAccordionOpen(newValue || !accordionOpen);
     };
 
+    const filename = getIssueFilename(issue.upload_timestamp);
+
     return <View style={styles.issueListItemContainer}>
         <TouchableOpacity style={styles.issueListItem} onPress={toggleAccordion}>
             <View style={styles.issueNumberContainer}>
@@ -73,15 +83,51 @@ const IssueListItem = ({ controlAccordion, issue, navigation, selectIssue }) => 
                     visible={accordionOpen} 
                 />
                 <View style={styles.issueDetailsContainer}>
-                    <View style={styles.purchaseIssueButton}>
-                        <Button 
-                            color={styleConstants.button.color}
-                            title={"$4.99"}
-                            onPress={() => {
-                                selectIssue(issue.product_id);
-                            }}
-                        />
-                    </View>
+                    { (!fileCacheMap[filename] || fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.FAILED) && 
+                        <View style={styles.actionButton}>
+                            <Button 
+                                color={styleConstants.button.color}
+                                title={"Download Issue"}
+                                onPress={() => {
+                                    getResource(issue.upload_timestamp, RESOURCE_TYPE.ISSUE);
+                                }}
+                            />
+                        </View>
+                    }
+                    { fileCacheMap[filename] && fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.REQUESTED &&
+                        <View style={styles.actionButton}>
+                            <Button 
+                                color={styleConstants.button.color}
+                                disabled={true}
+                                title={"Requesting Issue..."}
+                            />
+                            <ActivityIndicator size={"small"} color={styleConstants.activityIndicator.color} />
+                        </View>
+                    }
+                    { fileCacheMap[filename] && fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.IN_PROGRESS &&
+                        <View style={styles.actionButton}>
+                            <Button 
+                                color={styleConstants.button.color}
+                                title={"Downloading (" + Math.floor(fileCacheMap[filename].progress*100) + "%)"}
+                                onPress={() => {
+                                    selectIssue(issue.product_id);
+                                    navigation.navigate('ViewIssue');
+                                }}
+                            />
+                        </View>
+                    }
+                    { fileCacheMap[filename] && fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.COMPLETED &&
+                        <View style={styles.actionButton}>
+                            <Button 
+                                color={styleConstants.button.color}
+                                title={"View Issue"}
+                                onPress={() => {
+                                    selectIssue(issue.product_id);
+                                    navigation.navigate('ViewIssue');
+                                }}
+                            />
+                        </View>
+                    }
                     <View style={styles.previewIssueButton}>
                         <Button 
                             color={styleConstants.button.color}
@@ -120,6 +166,16 @@ const styles = StyleSheet.create({
         overflow: "hidden",
         flex: 1,
         flexDirection: "column"
+    },
+    actionButton: {
+        backgroundColor: styleConstants.actionButton.color,
+        marginHorizontal: 6,
+        borderRadius: 6,
+        marginBottom: 4,
+        flex: 1,
+        flexDirection: "row",
+        justifyContent: "center",
+        maxHeight: 40
     },
     openAccordionIcon: {
         color: "#000000",
@@ -176,12 +232,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 6,
         borderRadius: 6,
         marginBottom: 4,
-    },
-    purchaseIssueButton: {
-        backgroundColor: "#D44",
-        marginHorizontal: 6,
-        borderRadius: 6,
-        marginBottom: 4,
     }
 });
 
@@ -190,9 +240,11 @@ IssueListItem.defaultProps = {
 }
 
 const mapStateToProps = (state) => ({
+    fileCacheMap: state.fileCacheMap
 });
 
 const mapDispatchToProps = () => dispatch => ({
+    getResource: (uploadTimestamp, resourceType, page) => dispatch(getResourceAction(uploadTimestamp, resourceType, page)),
     selectIssue: productId => dispatch({ type: "SELECT_ISSUE", payload: { productId }})
 });
 

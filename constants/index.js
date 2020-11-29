@@ -19,3 +19,7 @@ export const HEROS_TO_PREFETCH_URL = 15;
 export const ISSUE_LIST_DESCRIPTION_LENGTH = 120;
 export const ACCORDION_DURATION = 300;
 export const MAX_PREVIEW_CACHE_SIZE = 5;
+
+// Just for development, before apple receipts are
+// verified, I want to download issue PDFs from the api with this key.
+export const TEMPORARY_ISSUE_KEY = "knqvgtmnezhhyuvwwrpgxfkttpkdxpfj"; 

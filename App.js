@@ -19,7 +19,7 @@ import thunk from "redux-thunk";
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import IssueList from './components/IssueList';
-import PreviewIssue from './components/PreviewIssue';
+import ViewIssue from './components/ViewIssue';
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistStore, persistReducer } from 'redux-persist';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -51,6 +51,8 @@ const LogoTitle = () => {
   return <Image source={decibelLogoHeaderImage} style={styles.decibelLogoHeaderImage} />
 }
 
+const PreviewIssue = props => <ViewIssue previewOnly={true} {...props} />
+
 const App = () => {
   return (
     <NavigationContainer>
@@ -76,6 +78,12 @@ const App = () => {
                 component={PreviewIssue}
                 options={{
                   title: "Preview"
+                }} />
+              <Stack.Screen 
+                name="ViewIssue" 
+                component={ViewIssue}
+                options={{
+                  title: "View Issue"
                 }} />
             </Stack.Navigator>
           </SafeAreaView>

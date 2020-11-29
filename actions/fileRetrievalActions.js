@@ -1,4 +1,4 @@
-import { ENDPOINT_RESOURCE_LAMBDA } from '../constants';
+import { ENDPOINT_RESOURCE_LAMBDA, TEMPORARY_ISSUE_KEY } from '../constants';
 import RNFetchBlob from 'rn-fetch-blob';
 import {
     getPreviewPdfFilename,
@@ -18,7 +18,7 @@ const headers = {
 const PROGRESS_FACTOR = 100;
 
 const failFileCache = (err, dispatch, filename) => {
-    console.error("Error fetching resource", err);
+    console.error("Error fetching resource", JSON.stringify(err));
     dispatch({ type: "FAIL_FILE_CACHE", payload: { filename }});
     dispatch({
         type: "ERROR",
@@ -32,12 +32,9 @@ const getFilePath = (filename) => (RNFetchBlob.fs.dirs.DocumentDir + "/" + filen
 
 const fetchResource = (dispatch, filename, url) => {
     let dirs = RNFetchBlob.fs.dirs;
-    dispatch({ type: "REQUEST_FILE_CACHE", payload: { filename } });
-    return RNFetchBlob.config({
-        path : getFilePath(filename)
-    })
-    .fetch('GET', url)
-    .progress({ count : PROGRESS_FACTOR }, (received, total) => {
+    let task = RNFetchBlob.config({ path : getFilePath(filename) }).fetch('GET', url);
+    dispatch({ type: "REQUEST_FILE_CACHE", payload: { filename, task } });
+    return task.progress({ count : PROGRESS_FACTOR }, (received, total) => {
         //console.log('progress', received / total);
         dispatch({
             type: "IN_PROGRESS_FILE_CACHE",
@@ -46,8 +43,7 @@ const fetchResource = (dispatch, filename, url) => {
                 progress: (received / total)
             }
         });
-    })
-    .then((resourceResponse) => {
+    }).then((resourceResponse) => {
         //console.log('Got resource response', resourceResponse);
         dispatch({
             type: "COMPLETE_FILE_CACHE",
@@ -57,6 +53,23 @@ const fetchResource = (dispatch, filename, url) => {
             }
         });
     }).catch(err => failFileCache(err, dispatch, filename));    
+}
+
+export const cancelGetResource = (filename, task) => dispatch => {
+    task.cancel(err => {
+        if (err) {
+            console.error("Error canceling task", filename, task, JSON.stringify(err));
+            dispatch({
+                type: "FAIL_FILE_CACHE",
+                payload: { filename }
+            })
+            return;
+        }
+        dispatch({
+            type: "REMOVE_FILE_CACHE",
+            payload: { filename }
+        });
+    });
 }
 
 export const getResourceLink = (uploadTimestamp, resourceType, page) => dispatch => {
@@ -114,6 +127,7 @@ export const getResource = (uploadTimestamp, resourceType, page) => dispatch => 
     if (page) {
         data.page = page;
     }
+    data.key = TEMPORARY_ISSUE_KEY;
     //console.log("Fetching resource " + ENDPOINT_RESOURCE_LAMBDA, data, filename);
     dispatch({ type: "REQUEST_FILE_CACHE", payload: { filename } });
     fetch(ENDPOINT_RESOURCE_LAMBDA, {
