@@ -16,6 +16,7 @@ import Icon from 'react-native-ionicons';
 import IssueListItem from './IssueListItem';
 import { MAX_ISSUE_LIST_AGE } from '../constants';
 import BottomNavigation from './BottomNavigation';
+import SplashScreen from 'react-native-splash-screen'
 
 const issueListIsAlive = issueListRequestedTimestamp => (issueListRequestedTimestamp + MAX_ISSUE_LIST_AGE) >= Date.now();
 
@@ -26,6 +27,12 @@ const IssueList = ({ getIssueList, issueList, issueListRequestedTimestamp, navig
             getIssueList();
         }
     }, []);
+
+    React.useEffect(() => {
+        if (!!issueList) {
+            SplashScreen.hide();
+        }
+    }, [issueList])
 
     return (
         <View style={styles.container}>
