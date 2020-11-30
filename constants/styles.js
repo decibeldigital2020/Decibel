@@ -23,6 +23,9 @@ export const styleConstants = {
     iconMedium: {
         color: "#555"
     },
+    passiveButton: {
+        color: "#555"
+    },
     selectedIssueName: {
         color: "#F00"
     },

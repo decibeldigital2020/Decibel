@@ -12,15 +12,14 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { getIssueList } from '../actions/issueListActions';
-import Icon from 'react-native-ionicons';
 import IssueListItem from './IssueListItem';
 import { MAX_ISSUE_LIST_AGE } from '../constants';
-import BottomNavigation from './BottomNavigation';
-import SplashScreen from 'react-native-splash-screen'
+import SplashScreen from 'react-native-splash-screen';
+import { getIssueFilename } from '../util/fileRetrievalUtil';
 
 const issueListIsAlive = issueListRequestedTimestamp => (issueListRequestedTimestamp + MAX_ISSUE_LIST_AGE) >= Date.now();
 
-const IssueList = ({ getIssueList, issueList, issueListRequestedTimestamp, navigation, requestingIssueList }) => {
+const IssueList = ({ downloadsOnly, fileCacheMap, getIssueList, issueList, issueListRequestedTimestamp, navigation, ownedOnly, requestingIssueList }) => {
 
     React.useEffect(() => {
         if ((!issueList || !issueListIsAlive(issueListRequestedTimestamp)) && !requestingIssueList) {
@@ -34,25 +33,43 @@ const IssueList = ({ getIssueList, issueList, issueListRequestedTimestamp, navig
         }
     }, [issueList])
 
+    if (!issueList) {
+        return null;
+    }
+
+    let data = !!downloadsOnly 
+        ? issueList.issues.filter(issue => Object.keys(fileCacheMap).includes(getIssueFilename(issue.upload_timestamp)))
+        : (!!ownedOnly
+            ? issueList.issues
+            : issueList.issues);
+
     return (
         <View style={styles.container}>
             { issueList && 
                 <FlatList
                     style={styles.issueList}
-                    data={issueList.issues}
+                    data={data}
                     onRefresh={() => getIssueList()}
                     refreshing={requestingIssueList}
                     renderItem={(issue) => 
                         <IssueListItem 
                             controlAccordion={[0, 1, 2].map(i => issueList.issues[i].product_id).includes(issue.item.product_id)}
+                            downloadView={!!downloadsOnly}
                             issue={issue.item} 
                             navigation={navigation} 
+                            owned={!!ownedOnly}
                             />}
                     keyExtractor={issue => issue.issue_number.toString()}
                     showsVerticalScrollIndicator={false}
                 />
             }
-            <BottomNavigation navigation={navigation} />
+            { issueList && !!downloadsOnly && data.length === 0 &&
+                <View style={styles.noDownloads}>
+                    <Text style={styles.noDownloadsText}>
+                        You have no downloaded issues yet.
+                    </Text>
+                </View>
+            }
         </View>
     );
 }
@@ -75,6 +92,21 @@ const styles = StyleSheet.create({
     },
     issueList: {
         marginHorizontal: 16
+    },
+    noDownloads: {
+        flex: 1,
+        flexDirection: "column",
+        justifyContent: "center"
+    },
+    noDownloadsText: {
+        color: "#FFF",
+        fontWeight: "500",
+        flex: 1,
+        justifyContent: "center",
+        flexDirection: "column",
+        fontSize: 20,
+        marginLeft: "auto",
+        marginRight: "auto"
     }
 });
 
@@ -85,6 +117,7 @@ IssueList.defaultProps = {
 }
 
 const mapStateToProps = (state) => ({
+    fileCacheMap: state.fileCacheMap,
     issueList: state.issueList,
     issueListRequestedTimestamp: state.issueListRequestedTimestamp,
     requestingIssueList: state.requesting.issueList

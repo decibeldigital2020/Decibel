@@ -66,16 +66,19 @@ const IssueHero = ({fileCacheMap, fileLinkMap, getResource, getResourceFromUrl, 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        flexDirection: "column",
         justifyContent: "center",
         maxWidth: HERO_IMAGE_SCALE,
-        height: HERO_IMAGE_SCALE * 1.34
+        backgroundColor: "#000",
+        borderRadius: 6
     },
     errorText: {
         padding: 4
     },
     heroImage: {
         width: HERO_IMAGE_SCALE,
-        height: HERO_IMAGE_SCALE * 1.34
+        height: HERO_IMAGE_SCALE * 1.34,
+        borderRadius: 6
     }
 })
 

@@ -4,6 +4,7 @@ import {
     Animated,
     Button,
     Easing,
+    Modal,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -19,10 +20,10 @@ import {
     RESOURCE_TYPE 
 } from "../constants";
 import { styleConstants } from '../constants/styles';
-import { getResource as getResourceAction } from '../actions/fileRetrievalActions';
+import { getResource as getResourceAction, removeResource as removeResourceAction } from '../actions/fileRetrievalActions';
 import { getIssueFilename } from '../util/fileRetrievalUtil';
 
-const IssueListItem = ({ controlAccordion, fileCacheMap, getResource, issue, navigation, selectIssue }) => {
+const IssueListItem = ({ controlAccordion, downloadView, fileCacheMap, getResource, issue, owned, navigation, removeResource, selectIssue }) => {
 
     if (!issue) {
         return null;
@@ -31,6 +32,7 @@ const IssueListItem = ({ controlAccordion, fileCacheMap, getResource, issue, nav
     const [accordionOpen, setAccordionOpen] = React.useState(controlAccordion || false);
     const [bodySectionHeight, setBodySectionHeight] = React.useState(0);
     const animatedController = React.useRef(new Animated.Value(!!controlAccordion ? 1 : 0)).current;
+    const [deleteConfirmationModalOpen, setDeleteConfirmationModalOpen] = React.useState(false);
 
     const accordionHeight = animatedController.interpolate({
         inputRange: [0, 1],
@@ -128,19 +130,67 @@ const IssueListItem = ({ controlAccordion, fileCacheMap, getResource, issue, nav
                             />
                         </View>
                     }
-                    <View style={styles.previewIssueButton}>
-                        <Button 
-                            color={styleConstants.button.color}
-                            title={"Preview Issue"}
-                            onPress={() => {
-                                selectIssue(issue.product_id);
-                                navigation.navigate('PreviewIssue');
-                            }}
-                        />
-                    </View>
-                    <View style={styles.issueDescription}>
-                        <Text>{issue.description.slice(0, ISSUE_LIST_DESCRIPTION_LENGTH) + "..."}</Text>
-                    </View>
+                    { !downloadView && 
+                        <View style={styles.previewIssueButton}>
+                            <Button 
+                                color={styleConstants.button.color}
+                                title={"Preview Issue"}
+                                onPress={() => {
+                                    selectIssue(issue.product_id);
+                                    navigation.navigate('PreviewIssue');
+                                }}
+                            />
+                        </View>
+                    }
+                    { !downloadView &&
+                        <View style={styles.issueDescription}>
+                            <Text>{issue.description}</Text>
+                        </View>
+                    }
+                    { !!downloadView && fileCacheMap[filename] && fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.COMPLETED &&
+                        <View style={styles.passiveButton}>
+                            <Button 
+                                color={styleConstants.button.color}
+                                title={"Delete Issue"}
+                                onPress={() => {
+                                    setDeleteConfirmationModalOpen(true);
+                                }}
+                            />
+                        </View>
+                    }
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={deleteConfirmationModalOpen}
+                        onRequestClose={() => {
+                            Alert.alert("Modal has been closed.");
+                        }}>
+                        <View style={styles.modal}>
+                            <Text style={styles.modalText}>
+                                Are you sure you want to delete {issue.display_date + " - " + issue.issue_name}?
+                            </Text>
+                            <View style={styles.modalButtonGroup}>
+                                <View style={styles.actionButton}>
+                                    <Button
+                                        color={styleConstants.button.color}
+                                        title={"Yes, Delete Issue"}
+                                        onPress={() => {
+                                            removeResource(filename);
+                                        }} 
+                                    />
+                                </View>
+                                <View style={styles.passiveButton}>
+                                    <Button
+                                        color={styleConstants.button.color}
+                                        title={"No, Keep Issue"}
+                                        onPress={() => {
+                                            setDeleteConfirmationModalOpen(false);
+                                        }}
+                                    />
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
                 </View>
             </View>
         </Animated.View>
@@ -148,6 +198,31 @@ const IssueListItem = ({ controlAccordion, fileCacheMap, getResource, issue, nav
 }
 
 const styles = StyleSheet.create({
+    modal: {
+        flex: 1,
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 60,
+        backgroundColor: "#000"
+    },
+    modalText: {
+        flex: 1,
+        fontWeight: "500",
+        fontSize: 20,
+        color: "#FFF",
+        flexDirection: "column",
+        justifyContent: "center",
+        maxHeight: 100,
+        width: "90%"
+    },
+    modalButtonGroup: {
+        flex: 1,
+        flexDirection: "row",
+        justifyContent: "space-around",
+        maxHeight: 100,
+        width: "90%"
+    },
     accordion: {
         backgroundColor: "#EEE",
         borderRadius: 6,
@@ -183,6 +258,16 @@ const styles = StyleSheet.create({
         flexDirection: "column",
         justifyContent: "center",
         maxWidth: 40
+    },
+    passiveButton: {
+        backgroundColor: styleConstants.passiveButton.color,
+        marginHorizontal: 6,
+        borderRadius: 6,
+        marginBottom: 4,
+        flex: 1,
+        flexDirection: "row",
+        justifyContent: "center",
+        maxHeight: 40
     },
     displayDate: {
         fontWeight: "300"
@@ -236,6 +321,7 @@ const styles = StyleSheet.create({
 });
 
 IssueListItem.defaultProps = {
+    owned: false,
     issue: null
 }
 
@@ -245,6 +331,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = () => dispatch => ({
     getResource: (uploadTimestamp, resourceType, page) => dispatch(getResourceAction(uploadTimestamp, resourceType, page)),
+    removeResource: (filename) => dispatch(removeResourceAction(filename)),
     selectIssue: productId => dispatch({ type: "SELECT_ISSUE", payload: { productId }})
 });
 
