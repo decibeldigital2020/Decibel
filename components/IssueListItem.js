@@ -10,7 +10,7 @@ import {
     View
 } from 'react-native';
 import { connect } from 'react-redux';
-import Icon from 'react-native-ionicons';
+// import Icon from 'react-native-ionicons';
 import IssueHero from './IssueHero';
 import { 
     ACCORDION_DURATION, 
@@ -65,8 +65,8 @@ const IssueListItem = ({ controlAccordion, fileCacheMap, getResource, issue, nav
                 <Text style={[styles.issueName, {color: accordionOpen ? styleConstants.selectedIssueName.color : styleConstants.issueName.color}]}>{ issue.issue_name }</Text>
             </View>
             <View style={styles.openAccordionIcon}>
-                { !accordionOpen && <Icon name="arrow-down" color={styleConstants.icon.color} /> }
-                { accordionOpen && <Icon name="arrow-up" color={styleConstants.icon.color} /> }
+                { /*!accordionOpen && <Icon name="arrow-down" color={styleConstants.icon.color} />*/ }
+                { /*accordionOpen && <Icon name="arrow-up" color={styleConstants.icon.color} />*/ }
             </View>
         </TouchableOpacity>
         <Animated.View 

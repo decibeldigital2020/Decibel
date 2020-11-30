@@ -2,29 +2,50 @@ import React from 'react';
 import {
     StyleSheet,
     Text,
+    TouchableOpacity,
     View
 } from 'react-native';
-import Icon from 'react-native-ionicons';
 import { styleConstants } from '../constants/styles';
 
+const getIconColor = (active) => active ? styleConstants.iconLight.color : styleConstants.iconMedium.color;
+const getLabelStyles = (active) => active ? [styles.iconLabelText, styles.iconLabelTextHighlighted] : styles.iconLabelText;
+
 const BottomNavigation = ({navigation}) => {
+    console.log(navigation);
+    return null;
     return <View style={styles.container}>
-        <View style={styles.iconContainer}>
-            <Icon name="paper" color={styleConstants.iconLight.color} style={styles.icon} />
-            <Text style={[styles.iconLabelText, styles.iconLabelTextHighlighted]}>Issues</Text>
-        </View>
-        <View style={styles.iconContainer}>
-            <Icon name="cloud-download" color={styleConstants.iconMedium.color} style={styles.icon} />
-            <Text style={styles.iconLabelText}>Downloads</Text>
-        </View>
-        <View style={styles.iconContainer}>
-            <Icon name="paper" color={styleConstants.iconMedium.color} style={styles.icon} />
-            <Text style={styles.iconLabelText}>Library</Text>
-        </View>
-        <View style={styles.iconContainer}>
-            <Icon name="help-circle" color={styleConstants.iconMedium.color} style={styles.icon} />
-            <Text style={styles.iconLabelText}>Help</Text>
-        </View>
+        <TouchableOpacity
+            onPress={() => {
+                navigation.navigate("IssueList");
+            }}
+            style={styles.iconContainer}>
+            <Icon name="paper" color={getIconColor(true)} style={styles.icon} />
+            <Text style={getLabelStyles(true)}>Issues</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+            onPress={() => {
+                navigation.navigate("Downloads");
+            }}
+            style={styles.iconContainer}>
+            <Icon name="cloud-download" color={getIconColor(false)} style={styles.icon} />
+            <Text style={getLabelStyles(false)}>Downloads</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+            onPress={() => {
+                navigation.navigate("Library");
+            }}
+            style={styles.iconContainer}>
+            <Icon name="paper" color={getIconColor(false)} style={styles.icon} />
+            <Text style={getLabelStyles(false)}>Library</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+            onPress={() => {
+                navigation.navigate("Help");
+            }}
+            style={styles.iconContainer}>
+            <Icon name="help-circle" color={getIconColor(false)} style={styles.icon} />
+            <Text style={getLabelStyles(false)}>Help</Text>
+        </TouchableOpacity>
     </View>;
 }
 

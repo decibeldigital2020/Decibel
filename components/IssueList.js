@@ -12,15 +12,14 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { getIssueList } from '../actions/issueListActions';
-import Icon from 'react-native-ionicons';
 import IssueListItem from './IssueListItem';
 import { MAX_ISSUE_LIST_AGE } from '../constants';
-import BottomNavigation from './BottomNavigation';
-import SplashScreen from 'react-native-splash-screen'
+import SplashScreen from 'react-native-splash-screen';
+import { getIssueFilename } from '../util/fileRetrievalUtil';
 
 const issueListIsAlive = issueListRequestedTimestamp => (issueListRequestedTimestamp + MAX_ISSUE_LIST_AGE) >= Date.now();
 
-const IssueList = ({ getIssueList, issueList, issueListRequestedTimestamp, navigation, requestingIssueList }) => {
+const IssueList = ({ downloadsOnly, fileCacheMap, getIssueList, issueList, issueListRequestedTimestamp, navigation, ownedOnly, requestingIssueList }) => {
 
     React.useEffect(() => {
         if ((!issueList || !issueListIsAlive(issueListRequestedTimestamp)) && !requestingIssueList) {
@@ -34,12 +33,22 @@ const IssueList = ({ getIssueList, issueList, issueListRequestedTimestamp, navig
         }
     }, [issueList])
 
+    if (!issueList) {
+        return null;
+    }
+
+    let data = !!downloadsOnly 
+        ? issueList.issues.filter(issue => Object.keys(fileCacheMap).includes(getIssueFilename(issue.upload_timestamp)))
+        : (ownedOnly
+            ? issueList.issues
+            : issueList.issues);
+
     return (
         <View style={styles.container}>
             { issueList && 
                 <FlatList
                     style={styles.issueList}
-                    data={issueList.issues}
+                    data={data}
                     onRefresh={() => getIssueList()}
                     refreshing={requestingIssueList}
                     renderItem={(issue) => 
@@ -52,7 +61,6 @@ const IssueList = ({ getIssueList, issueList, issueListRequestedTimestamp, navig
                     showsVerticalScrollIndicator={false}
                 />
             }
-            <BottomNavigation navigation={navigation} />
         </View>
     );
 }
@@ -85,6 +93,7 @@ IssueList.defaultProps = {
 }
 
 const mapStateToProps = (state) => ({
+    fileCacheMap: state.fileCacheMap,
     issueList: state.issueList,
     issueListRequestedTimestamp: state.issueListRequestedTimestamp,
     requestingIssueList: state.requesting.issueList
