@@ -27,6 +27,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import decibelLogoHeaderImage from './img/decibel-header-logo.png';
 import { styleConstants } from './constants/styles';
 import Icon from 'react-native-ionicons';
+import Help from './components/Help';
 
 const persistedReducerConfig = {
   key: 'root',
@@ -64,7 +65,6 @@ const LogoTitle = props => <Image source={decibelLogoHeaderImage} style={styles.
 const PreviewIssue = props => <ViewIssue previewOnly={true} {...props} />;
 const Downloads = props => <IssueList downloadsOnly={true} {...props} />;
 const OwnedIssues = props => <IssueList ownedOnly={true} {...props} />;
-const Help = props => <IssueList {...props} />;
 
 const IssueListStack = (props) => 
   <Stack.Navigator
@@ -137,6 +137,18 @@ const LibraryStack = (props) =>
       }} />
   </Stack.Navigator>;
 
+const HelpStack = (props) => 
+  <Stack.Navigator
+    screenOptions={screenOptions}>
+    <Stack.Screen
+      name="Help"
+      component={Help}
+      options={{
+        title: "Help",
+        headerTitle: LogoTitle
+      }} />
+    </Stack.Navigator>;
+
 const App = () => {
   return (
     <NavigationContainer>
@@ -153,39 +165,48 @@ const App = () => {
                 component={IssueListStack}
                 options={{
                   tabBarLabel: 'Issues',
-                  tabBarIcon: ({ color, size }) => (
+                  tabBarIcon: ({ color, size }) =>
                     <Icon
                       name="paper"
                       color={color}
                       size={size}
                     />
-                  ),
-                }}  />
+                }} />
               <Tab.Screen
                 name="LibraryStack"
                 component={LibraryStack}
                 options={{
                   tabBarLabel: 'Library',
-                  tabBarIcon: ({ color, size }) => (
+                  tabBarIcon: ({ color, size }) =>
                     <Icon
                       name="paper"
                       color={color}
                       size={size}
                     />
-                  ),
                 }} />
               <Tab.Screen
                 name="DownloadsStack"
                 component={DownloadsStack}
                 options={{
                   tabBarLabel: 'Downloads',
-                  tabBarIcon: ({ color, size }) => (
+                  tabBarIcon: ({ color, size }) =>
                     <Icon
                       name="cloud-download"
                       color={color}
                       size={size}
                     />
-                  ),
+                }} />
+              <Tab.Screen
+                name="HelpStack"
+                component={HelpStack}
+                options={{
+                  tabBarLabel: 'Help',
+                  tabBarIcon: ({ color, size }) => 
+                    <Icon
+                      name="help"
+                      color={color}
+                      size={size}
+                    />
                 }} />
             </Tab.Navigator>
           </SafeAreaView>
