@@ -170,7 +170,8 @@ const App = () => {
                       name="paper"
                       color={color}
                       size={size}
-                    />
+                    />,
+                  unmountOnBlur: true
                 }} />
               <Tab.Screen
                 name="LibraryStack"
@@ -182,7 +183,8 @@ const App = () => {
                       name="paper"
                       color={color}
                       size={size}
-                    />
+                    />,
+                  unmountOnBlur: true
                 }} />
               <Tab.Screen
                 name="DownloadsStack"
@@ -194,7 +196,8 @@ const App = () => {
                       name="cloud-download"
                       color={color}
                       size={size}
-                    />
+                    />,
+                  unmountOnBlur: true
                 }} />
               <Tab.Screen
                 name="HelpStack"
@@ -206,7 +209,8 @@ const App = () => {
                       name="help"
                       color={color}
                       size={size}
-                    />
+                    />,
+                  unmountOnBlur: true
                 }} />
             </Tab.Navigator>
           </SafeAreaView>
