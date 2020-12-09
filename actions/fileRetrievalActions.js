@@ -18,7 +18,7 @@ const headers = {
 const PROGRESS_FACTOR = 100;
 
 const failFileCache = (err, dispatch, filename) => {
-    console.error("Error fetching resource", JSON.stringify(err));
+    // console.error("Error fetching resource", JSON.stringify(err));
     dispatch({ type: "FAIL_FILE_CACHE", payload: { filename }});
     dispatch({
         type: "ERROR",

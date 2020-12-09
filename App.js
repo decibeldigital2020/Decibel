@@ -24,10 +24,16 @@ import ViewIssue from './components/ViewIssue';
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistStore, persistReducer } from 'redux-persist';
 import AsyncStorage from '@react-native-community/async-storage';
-import decibelLogoHeaderImage from './img/decibel-header-logo.png';
 import { styleConstants } from './constants/styles';
 import Icon from 'react-native-ionicons';
 import Help from './components/Help';
+import LogoTitle from './components/LogoTitle';
+
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+const PreviewIssue = props => <ViewIssue previewOnly={true} {...props} />;
+const Downloads = props => <IssueList downloadsOnly={true} {...props} />;
+const OwnedIssues = props => <IssueList ownedOnly={true} {...props} />;
 
 const persistedReducerConfig = {
   key: 'root',
@@ -39,9 +45,6 @@ const persistor = persistStore(store);
 if(__DEV__) {
   persistor.purge();
 }
-
-const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
 
 const screenOptions = {
   headerStyle: { backgroundColor: styleConstants.statusBar.backgroundColor },
@@ -61,11 +64,6 @@ const tabBarOptions = {
   }
 };
 
-const LogoTitle = props => <Image source={decibelLogoHeaderImage} style={styles.decibelLogoHeaderImage} />;
-const PreviewIssue = props => <ViewIssue previewOnly={true} {...props} />;
-const Downloads = props => <IssueList downloadsOnly={true} {...props} />;
-const OwnedIssues = props => <IssueList ownedOnly={true} {...props} />;
-
 const IssueListStack = (props) => 
   <Stack.Navigator
     screenOptions={screenOptions}>
@@ -74,20 +72,6 @@ const IssueListStack = (props) =>
       component={IssueList}
       options={{
         title: "Issues",
-        headerTitle: LogoTitle
-      }} />
-    <Stack.Screen 
-      name="PreviewIssue" 
-      component={PreviewIssue}
-      options={{
-        title: "Preview",
-        headerTitle: LogoTitle
-      }} />
-    <Stack.Screen 
-      name="ViewIssue" 
-      component={ViewIssue}
-      options={{
-        title: "View Issue",
         headerTitle: LogoTitle
       }} />
   </Stack.Navigator>;
@@ -102,13 +86,6 @@ const DownloadsStack = (props) =>
         title: "Downloads",
         headerTitle: LogoTitle
       }} />
-    <Stack.Screen 
-      name="ViewIssue" 
-      component={ViewIssue}
-      options={{
-        title: "View Issue",
-        headerTitle: LogoTitle
-      }} />
   </Stack.Navigator>;
 
 const LibraryStack = (props) => 
@@ -119,20 +96,6 @@ const LibraryStack = (props) =>
       component={OwnedIssues}
       options={{
         title: "Library",
-        headerTitle: LogoTitle
-      }} />
-    <Stack.Screen 
-      name="PreviewIssue" 
-      component={PreviewIssue}
-      options={{
-        title: "Preview",
-        headerTitle: LogoTitle
-      }} />
-    <Stack.Screen 
-      name="ViewIssue" 
-      component={ViewIssue}
-      options={{
-        title: "View Issue",
         headerTitle: LogoTitle
       }} />
   </Stack.Navigator>;
@@ -147,7 +110,66 @@ const HelpStack = (props) =>
         title: "Help",
         headerTitle: LogoTitle
       }} />
-    </Stack.Navigator>;
+  </Stack.Navigator>;
+
+const RootTabNavigator = (props) =>
+  <Tab.Navigator
+    backBehavior={"none"}
+    initialRouteName="IssueList"
+    tabBarOptions={tabBarOptions}>
+    <Tab.Screen
+      name="IssueListStack"
+      component={IssueListStack}
+      options={{
+        tabBarLabel: 'Issues',
+        tabBarIcon: ({ color, size }) =>
+          <Icon
+            name="paper"
+            color={color}
+            size={size}
+          />,
+        unmountOnBlur: true
+      }} />
+    <Tab.Screen
+      name="LibraryStack"
+      component={LibraryStack}
+      options={{
+        tabBarLabel: 'Library',
+        tabBarIcon: ({ color, size }) =>
+          <Icon
+            name="paper"
+            color={color}
+            size={size}
+          />,
+        unmountOnBlur: true
+      }} />
+    <Tab.Screen
+      name="DownloadsStack"
+      component={DownloadsStack}
+      options={{
+        tabBarLabel: 'Downloads',
+        tabBarIcon: ({ color, size }) =>
+          <Icon
+            name="cloud-download"
+            color={color}
+            size={size}
+          />,
+        unmountOnBlur: true
+      }} />
+    <Tab.Screen
+      name="HelpStack"
+      component={HelpStack}
+      options={{
+        tabBarLabel: 'Help',
+        tabBarIcon: ({ color, size }) => 
+          <Icon
+            name="help"
+            color={color}
+            size={size}
+          />,
+        unmountOnBlur: true
+      }} />
+  </Tab.Navigator>;
 
 const App = () => {
   return (
@@ -156,63 +178,29 @@ const App = () => {
         <PersistGate loading={null} persistor={persistor}>
           <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" backgroundColor={styleConstants.statusBar.backgroundColor} />
-            <Tab.Navigator
-              backBehavior={"none"}
-              initialRouteName="IssueList"
-              tabBarOptions={tabBarOptions}>
-              <Tab.Screen
-                name="IssueListStack"
-                component={IssueListStack}
+            <Stack.Navigator>
+              <Stack.Screen
+                name="RootTabNavigator"
+                component={RootTabNavigator}
                 options={{
-                  tabBarLabel: 'Issues',
-                  tabBarIcon: ({ color, size }) =>
-                    <Icon
-                      name="paper"
-                      color={color}
-                      size={size}
-                    />,
-                  unmountOnBlur: true
+                  title: "Decibel",
+                  headerShown: false
                 }} />
-              <Tab.Screen
-                name="LibraryStack"
-                component={LibraryStack}
+              <Stack.Screen 
+                name="PreviewIssue" 
+                component={PreviewIssue}
                 options={{
-                  tabBarLabel: 'Library',
-                  tabBarIcon: ({ color, size }) =>
-                    <Icon
-                      name="paper"
-                      color={color}
-                      size={size}
-                    />,
-                  unmountOnBlur: true
+                  title: "Preview",
+                  headerShown: false
                 }} />
-              <Tab.Screen
-                name="DownloadsStack"
-                component={DownloadsStack}
+              <Stack.Screen 
+                name="ViewIssue" 
+                component={ViewIssue}
                 options={{
-                  tabBarLabel: 'Downloads',
-                  tabBarIcon: ({ color, size }) =>
-                    <Icon
-                      name="cloud-download"
-                      color={color}
-                      size={size}
-                    />,
-                  unmountOnBlur: true
+                  title: "View Issue",
+                  headerShown: false
                 }} />
-              <Tab.Screen
-                name="HelpStack"
-                component={HelpStack}
-                options={{
-                  tabBarLabel: 'Help',
-                  tabBarIcon: ({ color, size }) => 
-                    <Icon
-                      name="help"
-                      color={color}
-                      size={size}
-                    />,
-                  unmountOnBlur: true
-                }} />
-            </Tab.Navigator>
+            </Stack.Navigator>
           </SafeAreaView>
         </PersistGate>
       </Provider>
@@ -225,10 +213,6 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     backgroundColor: "#000"
-  },
-  decibelLogoHeaderImage: {
-    width: 96,
-    height: 16
   }
 });
 

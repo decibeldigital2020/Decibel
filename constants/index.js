@@ -13,9 +13,11 @@ export const RESOURCE_TYPE = {
     PREVIEW_PDF: "preview_pdf"
 };
 export const MAX_PRESIGNED_URL_AGE = (5 * 60 * 1000) - (30 * 1000); // 5 minutes minus 30 seconds for network lag
-export const MAX_ISSUE_LIST_AGE = 10 * 1000; // (24 * 60 * 60 * 1000); // 1 day
+export const MAX_ISSUE_LIST_AGE = (24 * 60 * 60 * 1000); // 1 day
 export const HEROS_TO_PREFETCH = 10;
 export const HEROS_TO_PREFETCH_URL = 15;
+export const HERO_IMAGE_SCALE = 150;
+export const HERO_IMAGE_RATIO = 1.34;
 export const ISSUE_LIST_DESCRIPTION_LENGTH = 120;
 export const ACCORDION_DURATION = 300;
 export const MAX_PREVIEW_CACHE_SIZE = 5;

@@ -12,6 +12,7 @@ import {
 import { FILE_RETRIEVAL_STATUS, MAX_PREVIEW_CACHE_SIZE, RESOURCE_TYPE } from '../constants';
 import { styleConstants } from '../constants/styles';
 import ErrorHelperText from './ErrorHelperText';
+import LogoTitle from './LogoTitle';
 
 const ViewIssue = ({ cancelGetResource, fileCacheMap, getResource, navigation, previewOnly, removeResource, selectedIssue }) => {
 
@@ -43,13 +44,31 @@ const ViewIssue = ({ cancelGetResource, fileCacheMap, getResource, navigation, p
 
     return <View style={styles.container}>
         { fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.COMPLETED &&
-            <PdfViewer resource={fileCacheMap[filename].localPath} />
+            <React.Fragment>
+                <PdfViewer resource={fileCacheMap[filename].localPath} />
+                <Button
+                    color={styleConstants.passiveButton.color}
+                    onPress={() => {
+                        navigation.goBack();
+                    }}
+                    style={styles.goBackButton}
+                    title={"Back"}
+                />
+            </React.Fragment>
         }
         { fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.REQUESTED &&
-            <ActivityIndicator size={"large"} color={styles.activityIndicator.color} />
+            <View style={styles.requested}>
+                <View style={styles.logoTitle}>
+                    <LogoTitle style={styles.logoTitleImage} />
+                </View>
+                <ActivityIndicator size={"large"} color={styles.activityIndicator.color} style={styles.requestedActivityIndicator} />
+            </View>
         }
         { fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.IN_PROGRESS &&
             <View style={styles.inProgress}>
+                <View style={styles.logoTitle}>
+                    <LogoTitle style={styles.logoTitleImage} />
+                </View>
                 <Text style={styles.issueTitle}>{ selectedIssue.display_date + " - " + selectedIssue.issue_name }</Text>
                 <View style={styles.progressInfo}>
                     <Text style={styles.inProgressText}>Downloading ({Math.floor(fileCacheMap[filename].progress*100)}%)...</Text>
@@ -64,12 +83,20 @@ const ViewIssue = ({ cancelGetResource, fileCacheMap, getResource, navigation, p
                         color={styleConstants.actionButton.color}
                         onPress={() => {
                             cancelGetResource(filename, fileCacheMap[filename].task);
-                            navigation.navigate('IssueList');
+                            navigation.goBack();
                         }}
                         style={styles.cancelDownloadButton}
                         title={"Cancel download"}
                     />
                 }
+                <Button
+                    color={styleConstants.passiveButton.color}
+                    onPress={() => {
+                        navigation.goBack();
+                    }}
+                    style={styles.goBackButton}
+                    title={"Continue in Background"}
+                />
             </View>
         }
         { fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.FAILED &&
@@ -89,6 +116,8 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         backgroundColor: "#000"
+    },
+    goBackButton: {
     },
     inProgress: {
         flex: 1,
@@ -110,8 +139,18 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         color: "#FFF",
         marginLeft: "auto",
-        marginRight: "auto",
-        marginTop: 36
+        marginRight: "auto"
+    },
+    logoTitle: {
+        flex: 1,
+        flexDirection: "row",
+        justifyContent: "center",
+        maxHeight: 50,
+        marginTop: 50
+    },
+    logoTitleImage: {
+        marginLeft: "auto",
+        marginRight: "auto"
     },
     progressInfo: {
         maxWidth: 250,
@@ -122,6 +161,14 @@ const styles = StyleSheet.create({
     },
     progressTintColor: {
         color: "#DDD"
+    },
+    requested: {
+        flex: 1,
+        flexDirection: "column",
+        justifyContent: "space-between"
+    },
+    requestedActivityIndicator: {
+        marginBottom: 10
     },
     trackTintColor: { 
         color: "#444"

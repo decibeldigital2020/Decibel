@@ -20,6 +20,7 @@
 		75D8AF5B9F595B23F0D6E2EE /* libPods-Decibel-DecibelTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 46E69E34046C92F5DAC5D0C8 /* libPods-Decibel-DecibelTests.a */; };
 		8537784B25737203000EBFB7 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8537784A25737203000EBFB7 /* Launch Screen.storyboard */; };
 		853778592573AF96000EBFB7 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 853778582573AF96000EBFB7 /* Launch Screen.storyboard */; };
+		858DAF53257F552900C056DF /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 858DAF52257F552900C056DF /* StoreKit.framework */; };
 		8C44E899848645D885A5BBEE /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FFDBC961DB834016B53B2ECC /* Ionicons.ttf */; };
 		BDA2641E3A453350B2329AED /* libPods-Decibel-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D53E12D2A4D635FCC47201E /* libPods-Decibel-tvOS.a */; };
 /* End PBXBuildFile section */
@@ -64,6 +65,7 @@
 		7FD8EE491B52F505FB529516 /* Pods-Decibel-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Decibel-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-Decibel-tvOS/Pods-Decibel-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		8537784A25737203000EBFB7 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		853778582573AF96000EBFB7 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
+		858DAF52257F552900C056DF /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		AA629442CDE2983985A6CBBB /* Pods-Decibel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Decibel.release.xcconfig"; path = "Target Support Files/Pods-Decibel/Pods-Decibel.release.xcconfig"; sourceTree = "<group>"; };
 		C329D57159E358D5CDAD1A16 /* Pods-Decibel-DecibelTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Decibel-DecibelTests.debug.xcconfig"; path = "Target Support Files/Pods-Decibel-DecibelTests/Pods-Decibel-DecibelTests.debug.xcconfig"; sourceTree = "<group>"; };
 		D419D0823B51B6D9347FEA48 /* Pods-Decibel-DecibelTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Decibel-DecibelTests.release.xcconfig"; path = "Target Support Files/Pods-Decibel-DecibelTests/Pods-Decibel-DecibelTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -87,6 +89,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				63DCAF86AA840BC9D7F54C84 /* libPods-Decibel.a in Frameworks */,
+				858DAF53257F552900C056DF /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,6 +161,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				858DAF52257F552900C056DF /* StoreKit.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				158EAF4A3CCE072919A39E0E /* libPods-Decibel.a */,

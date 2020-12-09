@@ -9,11 +9,16 @@ import {
     getResourceFromUrl as getResourceFromUrlAction,
     getResource as getResourceAction 
 } from '../actions/fileRetrievalActions';
-import { RESOURCE_TYPE, MAX_PRESIGNED_URL_AGE, FILE_RETRIEVAL_STATUS } from '../constants';
+import { 
+    RESOURCE_TYPE, 
+    MAX_PRESIGNED_URL_AGE, 
+    FILE_RETRIEVAL_STATUS,
+    HERO_IMAGE_SCALE,
+    HERO_IMAGE_RATIO 
+} from '../constants';
 import { styleConstants } from '../constants/styles';
 import ErrorHelperText from './ErrorHelperText';
 
-const HERO_IMAGE_SCALE = 150;
 
 const IssueHero = ({fileCacheMap, fileLinkMap, getResource, getResourceFromUrl, uploadTimestamp, visible}) => {
 
@@ -69,6 +74,7 @@ const styles = StyleSheet.create({
         flexDirection: "column",
         justifyContent: "center",
         maxWidth: HERO_IMAGE_SCALE,
+        minHeight: HERO_IMAGE_SCALE * HERO_IMAGE_RATIO,
         backgroundColor: "#000",
         borderRadius: 6
     },
@@ -77,7 +83,7 @@ const styles = StyleSheet.create({
     },
     heroImage: {
         width: HERO_IMAGE_SCALE,
-        height: HERO_IMAGE_SCALE * 1.34,
+        height: HERO_IMAGE_SCALE * HERO_IMAGE_RATIO,
         borderRadius: 6
     }
 })

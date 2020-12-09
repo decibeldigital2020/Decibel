@@ -2485,6 +2485,11 @@
   dependencies:
     "webidl-conversions" "^4.0.2"
 
+"dooboolab-welcome@^1.2.0":
+  "integrity" "sha512-XgEbjJHAsKLge/e8jtuHsv84Ovg1Gx0GvnOTOmOlVGV1643nduTAkT3fyo/mxKbzvyXBr47RHaJAY4R2toI0UA=="
+  "resolved" "https://registry.npmjs.org/dooboolab-welcome/-/dooboolab-welcome-1.2.0.tgz"
+  "version" "1.2.0"
+
 "ecc-jsbn@~0.1.1":
   "integrity" "sha1-OoOpBOVDUyh4dMVkt1SThoSamMk="
   "resolved" "https://registry.npmjs.org/ecc-jsbn/-/ecc-jsbn-0.1.2.tgz"
@@ -5781,6 +5786,13 @@
     "invariant" "^2.2.4"
     "prop-types" "^15.7.2"
 
+"react-native-iap@^5.2.0":
+  "integrity" "sha512-OSABKsp+SuEY1iX1L0y3XZdUskfkJ/7vgo44sPQibJoOu7sBcUUoWWxDRaDYJoNf2Lz9Fn5hnVCcxEgzY+zcDw=="
+  "resolved" "https://registry.npmjs.org/react-native-iap/-/react-native-iap-5.2.0.tgz"
+  "version" "5.2.0"
+  dependencies:
+    "dooboolab-welcome" "^1.2.0"
+
 "react-native-ionicons@^4.6.5":
   "integrity" "sha512-s2Ia7M5t609LE9LWygMj3ALVPUlKhK7R9XcMb67fP4EYJv0oLcwg5pc+8ftv9XXaUuTW/WgL3zJlBYxAvtvMJg=="
   "resolved" "https://registry.npmjs.org/react-native-ionicons/-/react-native-ionicons-4.6.5.tgz"
@@ -5831,7 +5843,7 @@
     "escape-string-regexp" "2.0.0"
     "invariant" "2.2.4"
 
-"react-native@*", "react-native@>=0.42.0", "react-native@>=0.57", "react-native@>=0.57.0", "react-native@>=0.59", "react-native@>=0.59.5", "react-native@>=0.60 <0.64", "react-native@>=0.60.0", "react-native@>=0.62.0-rc.0 <0.64.0", "react-native@0.63.3":
+"react-native@*", "react-native@>=0.42.0", "react-native@>=0.54", "react-native@>=0.57", "react-native@>=0.57.0", "react-native@>=0.59", "react-native@>=0.59.5", "react-native@>=0.60 <0.64", "react-native@>=0.60.0", "react-native@>=0.62.0-rc.0 <0.64.0", "react-native@0.63.3":
   "integrity" "sha512-71wq13uNo5W8QVQnFlnzZ3AD+XgUBYGhpsxysQFW/hJ8GAt/J5o+Bvhy81FXichp6IBDJDh/JgfHH2gNji8dFA=="
   "resolved" "https://registry.npmjs.org/react-native/-/react-native-0.63.3.tgz"
   "version" "0.63.3"
