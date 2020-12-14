@@ -1,5 +1,6 @@
 export const ENDPOINT_ISSUE_LIST_LAMBDA = "https://hg0yi3q9vb.execute-api.us-east-1.amazonaws.com/production/issuelist";
 export const ENDPOINT_RESOURCE_LAMBDA = "https://f5md774521.execute-api.us-east-1.amazonaws.com/production/resource";
+export const MANAGE_SUBSCRIPTIONS_URL_IOS = "https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/manageSubscriptions";
 export const FILE_RETRIEVAL_STATUS = {
     REQUESTED: "requested",
     IN_PROGRESS: "in_progress",
@@ -21,7 +22,3 @@ export const HERO_IMAGE_RATIO = 1.34;
 export const ISSUE_LIST_DESCRIPTION_LENGTH = 120;
 export const ACCORDION_DURATION = 300;
 export const MAX_PREVIEW_CACHE_SIZE = 5;
-
-// Just for development, before apple receipts are
-// verified, I want to download issue PDFs from the api with this key.
-export const TEMPORARY_ISSUE_KEY = "knqvgtmnezhhyuvwwrpgxfkttpkdxpfj"; 

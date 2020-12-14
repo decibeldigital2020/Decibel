@@ -21,9 +21,23 @@ import {
 } from "../constants";
 import { styleConstants } from '../constants/styles';
 import { getResource as getResourceAction, removeResource as removeResourceAction } from '../actions/fileRetrievalActions';
+import { requestNewPurchase as requestNewPurchaseAction } from '../actions/iapActions';
 import { getIssueFilename } from '../util/fileRetrievalUtil';
 
-const IssueListItem = ({ controlAccordion, downloadView, fileCacheMap, getResource, issue, owned, navigation, removeResource, selectIssue }) => {
+const IssueListItem = ({ 
+    controlAccordion, 
+    downloaded, 
+    fileCacheMap, 
+    getResource, 
+    issue, 
+    owned, 
+    navigation, 
+    product,
+    purchase,
+    requestNewPurchase,
+    removeResource, 
+    selectIssue 
+}) => {
 
     if (!issue) {
         return null;
@@ -45,14 +59,25 @@ const IssueListItem = ({ controlAccordion, downloadView, fileCacheMap, getResour
         }
     }, [controlAccordion]);
 
-    const toggleAccordion = ({newValue=false}) => {
+    const getPrice = () => 
+        product 
+            ? product.localizedPrice
+            : "";
+
+    const getReceipt = () =>
+        purchase
+            ? purchase.transactionReceipt
+            : null;
+
+    const toggleAccordion = (newValue=false) => {
+        newValue = newValue || !accordionOpen;
         Animated.timing(animatedController, {
             duration: ACCORDION_DURATION,
-            toValue: (newValue || accordionOpen) ? 0 : 1,
+            toValue: (accordionOpen) ? 0 : 1,
             easing: Easing.bezier(0.4, 0.0, 0.2, 1),
             useNativeDriver: false
         }).start();
-        setAccordionOpen(newValue || !accordionOpen);
+        setAccordionOpen(newValue);
     };
 
     const filename = getIssueFilename(issue.upload_timestamp);
@@ -75,28 +100,36 @@ const IssueListItem = ({ controlAccordion, downloadView, fileCacheMap, getResour
             style={[styles.accordionContainer, { height: accordionHeight }]}>
             <View 
                 style={styles.accordion}
-                onLayout={event => {
-                    setBodySectionHeight(event.nativeEvent.layout.height);
-                }
-                }>
+                onLayout={event => setBodySectionHeight(event.nativeEvent.layout.height) }>
                 <IssueHero 
                     uploadTimestamp={issue.upload_timestamp} 
                     style={styles.issueHero}
                     visible={accordionOpen} 
                 />
                 <View style={styles.issueDetailsContainer}>
-                    { (!fileCacheMap[filename] || fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.FAILED) && 
+                    { !owned &&
+                        <View style={styles.actionButton}>
+                            <Button
+                                color={styleConstants.button.color}
+                                title={"Buy " + getPrice()}
+                                onPress={() => {
+                                    requestNewPurchase(issue.sku);
+                                }}
+                            />
+                        </View>
+                    }
+                    { !!owned && (!fileCacheMap[filename] || fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.FAILED) && 
                         <View style={styles.actionButton}>
                             <Button 
                                 color={styleConstants.button.color}
                                 title={"Download Issue"}
                                 onPress={() => {
-                                    getResource(issue.upload_timestamp, RESOURCE_TYPE.ISSUE);
+                                    getResource(issue.upload_timestamp, RESOURCE_TYPE.ISSUE, null, getReceipt());
                                 }}
                             />
                         </View>
                     }
-                    { fileCacheMap[filename] && fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.REQUESTED &&
+                    { !!owned && fileCacheMap[filename] && fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.REQUESTED &&
                         <View style={styles.actionButton}>
                             <Button 
                                 color={styleConstants.button.color}
@@ -106,7 +139,7 @@ const IssueListItem = ({ controlAccordion, downloadView, fileCacheMap, getResour
                             <ActivityIndicator size={"small"} color={styleConstants.activityIndicator.color} />
                         </View>
                     }
-                    { fileCacheMap[filename] && fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.IN_PROGRESS &&
+                    { !!owned && fileCacheMap[filename] && fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.IN_PROGRESS &&
                         <View style={styles.actionButton}>
                             <Button 
                                 color={styleConstants.button.color}
@@ -118,7 +151,7 @@ const IssueListItem = ({ controlAccordion, downloadView, fileCacheMap, getResour
                             />
                         </View>
                     }
-                    { fileCacheMap[filename] && fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.COMPLETED &&
+                    { !!owned && fileCacheMap[filename] && fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.COMPLETED &&
                         <View style={styles.actionButton}>
                             <Button 
                                 color={styleConstants.button.color}
@@ -130,7 +163,7 @@ const IssueListItem = ({ controlAccordion, downloadView, fileCacheMap, getResour
                             />
                         </View>
                     }
-                    { !downloadView && 
+                    { !downloaded && 
                         <View style={styles.previewIssueButton}>
                             <Button 
                                 color={styleConstants.button.color}
@@ -142,12 +175,12 @@ const IssueListItem = ({ controlAccordion, downloadView, fileCacheMap, getResour
                             />
                         </View>
                     }
-                    { !downloadView &&
+                    { !downloaded &&
                         <View style={styles.issueDescription}>
                             <Text>{issue.description}</Text>
                         </View>
                     }
-                    { !!downloadView && fileCacheMap[filename] && fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.COMPLETED &&
+                    { !!downloaded && fileCacheMap[filename] && fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.COMPLETED &&
                         <View style={styles.passiveButton}>
                             <Button 
                                 color={styleConstants.button.color}
@@ -162,9 +195,7 @@ const IssueListItem = ({ controlAccordion, downloadView, fileCacheMap, getResour
                         animationType="slide"
                         transparent={true}
                         visible={deleteConfirmationModalOpen}
-                        onRequestClose={() => {
-                            Alert.alert("Modal has been closed.");
-                        }}>
+                        onRequestClose={() => {}}>
                         <View style={styles.modal}>
                             <Text style={styles.modalText}>
                                 Are you sure you want to delete {issue.display_date + " - " + issue.issue_name}?
@@ -330,8 +361,9 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = () => dispatch => ({
-    getResource: (uploadTimestamp, resourceType, page) => dispatch(getResourceAction(uploadTimestamp, resourceType, page)),
+    getResource: (uploadTimestamp, resourceType, page, receipt) => dispatch(getResourceAction(uploadTimestamp, resourceType, page, receipt)),
     removeResource: (filename) => dispatch(removeResourceAction(filename)),
+    requestNewPurchase: (sku) => dispatch(requestNewPurchaseAction(sku)),
     selectIssue: productId => dispatch({ type: "SELECT_ISSUE", payload: { productId }})
 });
 

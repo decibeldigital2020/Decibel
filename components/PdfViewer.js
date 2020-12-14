@@ -13,7 +13,7 @@ const PdfViewer = ({ resource }) => {
         spacing={0}
         style={styles.container}
         onError={(error) => {
-            console.error(error);
+            console.error("PdfViewer", error);
         }}
     />;
 };

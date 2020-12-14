@@ -95,7 +95,7 @@ const ViewIssue = ({ cancelGetResource, fileCacheMap, getResource, navigation, p
                         navigation.goBack();
                     }}
                     style={styles.goBackButton}
-                    title={"Continue in Background"}
+                    title={"Continue in background"}
                 />
             </View>
         }

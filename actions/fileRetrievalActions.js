@@ -1,4 +1,4 @@
-import { ENDPOINT_RESOURCE_LAMBDA, TEMPORARY_ISSUE_KEY } from '../constants';
+import { ENDPOINT_RESOURCE_LAMBDA } from '../constants';
 import RNFetchBlob from 'rn-fetch-blob';
 import {
     getPreviewPdfFilename,
@@ -118,7 +118,7 @@ export const getResourceFromLink = (url) => dispatch => {
     fetchResource(dispatch, filename, url);
 }
 
-export const getResource = (uploadTimestamp, resourceType, page) => dispatch => {
+export const getResource = (uploadTimestamp, resourceType, page, receipt) => dispatch => {
     let filename = getFilenameByResourceType(uploadTimestamp, resourceType);
     let data = {
         resource_type: resourceType,
@@ -127,7 +127,9 @@ export const getResource = (uploadTimestamp, resourceType, page) => dispatch => 
     if (page) {
         data.page = page;
     }
-    data.key = TEMPORARY_ISSUE_KEY;
+    if (receipt) {
+        data.receipt = receipt;
+    }
     //console.log("Fetching resource " + ENDPOINT_RESOURCE_LAMBDA, data, filename);
     dispatch({ type: "REQUEST_FILE_CACHE", payload: { filename } });
     fetch(ENDPOINT_RESOURCE_LAMBDA, {

@@ -1,6 +1,12 @@
 import { FILE_RETRIEVAL_STATUS } from '../constants';
 
 const initialState = {
+    availableProducts: [
+        // IAP.Product
+    ],
+    availableSubscriptions: [
+        // IAP.Product
+    ],
     fileCacheMap: {
         /*
          * filename: {
@@ -18,8 +24,17 @@ const initialState = {
          * }
          */
     },
-    issueList: null, // mocks.issueListResponse
+    issueList: null, // See mocks.issueListResponse
     issueListRequestedTimestamp: 0,
+    ownedProducts: {
+        /*
+         * product_sku: {
+         *   ios: object (iOs receipt object)
+         * }
+         */
+    },
+    ownedProductsRequestedTimestamp: 0,
+    processingTransaction: false,
     requesting: {
         /*
          * name: oneOf: [true, false]
@@ -31,6 +46,32 @@ const initialState = {
 const reducer = (state = initialState, action) => {
     let newState = Object.assign({}, state);
     switch(action.type) {
+        case "AVAILABLE_PRODUCTS": {
+            return {
+                ...newState,
+                availableProducts: action.payload
+            }
+        }
+        case "AVAILABLE_SUBSCRIPTIONS": {
+            return {
+                ...newState,
+                availableSubscriptions: action.payload
+            }
+        }
+        case "PURCHASE": {
+            let newOwnedProducts = Object.assign({}, newState.ownedProducts);
+            newOwnedProducts[action.payload.sku] = action.payload.purchase;
+            return {
+                ...newState,
+                ownedProducts: newOwnedProducts
+            };
+        }
+        case "RESTORE_PURCHASES": {
+            return {
+                ...newState,
+                ownedProducts: action.payload
+            }
+        }
         case "REQUESTING": {
             return {
                 ...newState,
@@ -137,6 +178,14 @@ const reducer = (state = initialState, action) => {
                 newState.selectedIssue = null;
             }
             return newState;
+        }
+
+        //In app purchases
+        case "PROCESSING_TRANSACTION": {
+            return {
+                ...newState,
+                processingTransaction: action.payload
+            }
         }
     	default:
             return state;

@@ -11,15 +11,39 @@ import {
     View
 } from 'react-native';
 import { connect } from 'react-redux';
-import { getIssueList } from '../actions/issueListActions';
+import { getIssueList as getIssueListAction } from '../actions/issueListActions';
 import IssueListItem from './IssueListItem';
 import { MAX_ISSUE_LIST_AGE } from '../constants';
 import SplashScreen from 'react-native-splash-screen';
 import { getIssueFilename } from '../util/fileRetrievalUtil';
+import {
+    ALL_SUBSCRIPTIONS
+} from '../constants/products';
+import {
+    getAvailableProducts as getAvailableProductsAction,
+    getAvailableSubscriptions as getAvailableSubscriptionsAction
+} from '../actions/iapActions';
 
-const issueListIsAlive = issueListRequestedTimestamp => (issueListRequestedTimestamp + MAX_ISSUE_LIST_AGE) >= Date.now();
+const issueListIsAlive = issueListRequestedTimestamp => 
+    (issueListRequestedTimestamp + MAX_ISSUE_LIST_AGE) >= Date.now();
 
-const IssueList = ({ downloadsOnly, fileCacheMap, getIssueList, issueList, issueListRequestedTimestamp, navigation, ownedOnly, requestingIssueList }) => {
+const IssueList = ({ 
+    availableProducts,
+    availableSubscriptions,
+    downloadsOnly, 
+    fileCacheMap, 
+    getAvailableProducts,
+    getAvailableSubscriptions,
+    getIssueList, 
+    issueList, 
+    issueListRequestedTimestamp, 
+    navigation, 
+    ownedOnly, 
+    ownedProducts,
+    requestingIssueList,
+    requestingProducts,
+    requestingSubscriptions
+}) => {
 
     React.useEffect(() => {
         if ((!issueList || !issueListIsAlive(issueListRequestedTimestamp)) && !requestingIssueList) {
@@ -28,20 +52,55 @@ const IssueList = ({ downloadsOnly, fileCacheMap, getIssueList, issueList, issue
     }, []);
 
     React.useEffect(() => {
-        if (!!issueList) {
-            SplashScreen.hide();
+        if (!!issueList && !requestingProducts && (!availableProducts || availableProducts.length === 0)) {
+            getAvailableProducts(issueList.issues.map(issue => issue.sku));
         }
-    }, [issueList])
+    }, [issueList]);
+
+    React.useEffect(() => {
+        if (!!availableProducts && availableProducts.length > 0) {
+            SplashScreen.hide();
+            if ((!availableSubscriptions || availableSubscriptions.length === 0) && !requestingSubscriptions) {
+                getAvailableSubscriptions();
+            }
+        }
+    }, [availableProducts]);
 
     if (!issueList) {
         return null;
     }
 
-    let data = !!downloadsOnly 
+    const data = !!downloadsOnly 
         ? issueList.issues.filter(issue => Object.keys(fileCacheMap).includes(getIssueFilename(issue.upload_timestamp)))
         : (!!ownedOnly
             ? issueList.issues
             : issueList.issues);
+
+    const getProduct = (issue) => {
+        if (!availableProducts || availableProducts.length === 0) {
+            return null;
+        }
+        let index = availableProducts.findIndex(p => p.productId === issue.sku);
+        if (index !== -1) {
+            return availableProducts[index];
+        }
+    }
+
+    const getPurchase = issue => {
+        if (!ownedProducts) {
+            return null;
+        }
+        if (ownedProducts[issue.sku]) {
+            return ownedProducts[issue.sku];
+        } else {
+            return null; // TODO return subscription receipt
+        }
+    }
+
+    const subscriptionIncludesIssue = (issue) => false;
+
+    const isIssueOwned = (issue) => 
+        Object.keys(ownedProducts).includes(issue.sku) || subscriptionIncludesIssue(issue);
 
     return (
         <View style={styles.container}>
@@ -54,10 +113,12 @@ const IssueList = ({ downloadsOnly, fileCacheMap, getIssueList, issueList, issue
                     renderItem={(issue) => 
                         <IssueListItem 
                             controlAccordion={[0, 1, 2].map(i => issueList.issues[i].product_id).includes(issue.item.product_id)}
-                            downloadView={!!downloadsOnly}
+                            downloaded={!!downloadsOnly}
                             issue={issue.item} 
                             navigation={navigation} 
-                            owned={!!ownedOnly}
+                            owned={!!ownedOnly || isIssueOwned(issue.item)}
+                            product={getProduct(issue.item)}
+                            purchase={getPurchase(issue.item)}
                             />}
                     keyExtractor={issue => issue.issue_number.toString()}
                     showsVerticalScrollIndicator={false}
@@ -111,20 +172,28 @@ const styles = StyleSheet.create({
 });
 
 IssueList.defaultProps = {
-    getIssueList: () => {console.log("getIssueList not implemented")},
     issueList: null,
-    requestingIssueList: false
+    requestingIssueList: false,
+    requestingProducts: false,
+    requestingSubscriptions: false
 }
 
 const mapStateToProps = (state) => ({
+    availableProducts: state.availableProducts,
+    availableSubscriptions: state.availableSubscriptions,
     fileCacheMap: state.fileCacheMap,
     issueList: state.issueList,
     issueListRequestedTimestamp: state.issueListRequestedTimestamp,
-    requestingIssueList: state.requesting.issueList
+    ownedProducts: state.ownedProducts,
+    requestingIssueList: state.requesting.issueList,
+    requestingProducts: state.requesting.products,
+    requestingSubscriptions: state.requesting.subscriptions
 });
 
 const mapDispatchToProps = () => dispatch => ({
-    getIssueList: () => dispatch(getIssueList())
+    getAvailableProducts: (skuList) => dispatch(getAvailableProductsAction(skuList)),
+    getAvailableSubscriptions: () => dispatch(getAvailableSubscriptionsAction(ALL_SUBSCRIPTIONS)),
+    getIssueList: () => dispatch(getIssueListAction())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(IssueList);
