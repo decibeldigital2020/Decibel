@@ -14,6 +14,7 @@ import { connect } from 'react-redux';
 import { getIssueList as getIssueListAction } from '../actions/issueListActions';
 import IssueListItem from './IssueListItem';
 import { MAX_ISSUE_LIST_AGE } from '../constants';
+import { styleConstants } from '../constants/styles';
 import SplashScreen from 'react-native-splash-screen';
 import { getIssueFilename } from '../util/fileRetrievalUtil';
 import {
@@ -23,6 +24,7 @@ import {
     getAvailableProducts as getAvailableProductsAction,
     getAvailableSubscriptions as getAvailableSubscriptionsAction
 } from '../actions/iapActions';
+import RestorePurchasesButton from './RestorePurchasesButton';
 
 const issueListIsAlive = issueListRequestedTimestamp => 
     (issueListRequestedTimestamp + MAX_ISSUE_LIST_AGE) >= Date.now();
@@ -70,12 +72,6 @@ const IssueList = ({
         return null;
     }
 
-    const data = !!downloadsOnly 
-        ? issueList.issues.filter(issue => Object.keys(fileCacheMap).includes(getIssueFilename(issue.upload_timestamp)))
-        : (!!ownedOnly
-            ? issueList.issues
-            : issueList.issues);
-
     const getProduct = (issue) => {
         if (!availableProducts || availableProducts.length === 0) {
             return null;
@@ -102,6 +98,12 @@ const IssueList = ({
     const isIssueOwned = (issue) => 
         Object.keys(ownedProducts).includes(issue.sku) || subscriptionIncludesIssue(issue);
 
+    const data = !!downloadsOnly 
+        ? issueList.issues.filter(issue => Object.keys(fileCacheMap).includes(getIssueFilename(issue.upload_timestamp)))
+        : (!!ownedOnly
+            ? issueList.issues.filter(isIssueOwned)
+            : issueList.issues);
+
     return (
         <View style={styles.container}>
             { issueList && 
@@ -125,18 +127,22 @@ const IssueList = ({
                 />
             }
             { issueList && !!downloadsOnly && data.length === 0 &&
-                <View style={styles.noDownloads}>
-                    <Text style={styles.noDownloadsText}>
+                <View style={styles.issueListEmpty}>
+                    <Text style={styles.issueListEmptyText}>
                         You have no downloaded issues yet.
                     </Text>
                 </View>
             }
+            { issueList && !!ownedOnly && data.length === 0 &&
+                <View style={styles.issueListEmpty}>
+                    <Text style={styles.issueListEmptyText}>
+                        You do not own any issues yet. To re-sync your purchases, tap the button below.
+                    </Text>
+                    <RestorePurchasesButton />
+                </View>
+            }
         </View>
     );
-}
-
-const styleConstants = {
-    buttonColor: "#FFF"
 }
 
 const styles = StyleSheet.create({
@@ -154,12 +160,12 @@ const styles = StyleSheet.create({
     issueList: {
         marginHorizontal: 16
     },
-    noDownloads: {
+    issueListEmpty: {
         flex: 1,
         flexDirection: "column",
         justifyContent: "center"
     },
-    noDownloadsText: {
+    issueListEmptyText: {
         color: "#FFF",
         fontWeight: "500",
         flex: 1,
@@ -178,7 +184,7 @@ IssueList.defaultProps = {
     requestingSubscriptions: false
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
     availableProducts: state.availableProducts,
     availableSubscriptions: state.availableSubscriptions,
     fileCacheMap: state.fileCacheMap,
@@ -190,10 +196,10 @@ const mapStateToProps = (state) => ({
     requestingSubscriptions: state.requesting.subscriptions
 });
 
-const mapDispatchToProps = () => dispatch => ({
+const mapDispatchToProps = dispatch => ({
     getAvailableProducts: (skuList) => dispatch(getAvailableProductsAction(skuList)),
     getAvailableSubscriptions: () => dispatch(getAvailableSubscriptionsAction(ALL_SUBSCRIPTIONS)),
     getIssueList: () => dispatch(getIssueListAction())
-})
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(IssueList);

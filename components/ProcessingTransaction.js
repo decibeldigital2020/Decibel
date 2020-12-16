@@ -8,11 +8,14 @@ import {
 import { connect } from 'react-redux';
 import LogoTitle from './LogoTitle';
 
-const ProcessingTransaction = ({processingTransaction}) => {
+const ProcessingTransaction = ({processingTransaction, requesting}) => {
+
+    const isModalVisible = () => processingTransaction || requesting.purchases;
+
     return <Modal
         animationType="slide"
         transparent={true}
-        visible={processingTransaction}
+        visible={isModalVisible()}
         onRequestClose={() => {}}>
         <View style={styles.modal}>
             <View style={styles.logoTitle}>
@@ -50,7 +53,8 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => ({
-    processingTransaction: state.processingTransaction
+    processingTransaction: state.processingTransaction,
+    requesting: state.requesting
 });
 
 const mapDispatchToProps = dispatch => ({
