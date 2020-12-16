@@ -8,6 +8,9 @@ export const styleConstants = {
     button: {
         color: "#FFF"
     },
+    buttonStretch: {
+        alignSelf: 'stretch'
+    },
     issueName: {
         color: "#000"
     },

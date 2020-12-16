@@ -1,6 +1,7 @@
 import { FILE_RETRIEVAL_STATUS } from '../constants';
 
 const initialState = {
+    activeSubscription: null, // IAP.Purchase
     availableProducts: [
         // IAP.Product
     ],
@@ -28,9 +29,7 @@ const initialState = {
     issueListRequestedTimestamp: 0,
     ownedProducts: {
         /*
-         * product_sku: {
-         *   ios: object (iOs receipt object)
-         * }
+         * product_sku: IAP.Purchase
          */
     },
     ownedProductsRequestedTimestamp: 0,
@@ -46,6 +45,12 @@ const initialState = {
 const reducer = (state = initialState, action) => {
     let newState = Object.assign({}, state);
     switch(action.type) {
+        case "ACTIVE_SUBSCRIPTION": {
+            return {
+                ...newState,
+                activeSubscription: action.payload
+            }
+        }
         case "AVAILABLE_PRODUCTS": {
             return {
                 ...newState,
@@ -56,6 +61,65 @@ const reducer = (state = initialState, action) => {
             return {
                 ...newState,
                 availableSubscriptions: action.payload
+            }
+        }
+        case "COMPLETE_FILE_CACHE": {
+            newState.fileCacheMap = Object.assign({}, newState.fileCacheMap);
+            newState.fileCacheMap[action.payload.filename] = {
+                status: FILE_RETRIEVAL_STATUS.COMPLETED,
+                localPath: action.payload.localPath
+            }
+            return newState;
+        }
+        case "COMPLETE_FILE_LINK": {
+            newState.fileLinkMap = Object.assign({}, newState.fileLinkMap);
+            let newLinkEntry = Object.assign(newState.fileLinkMap[action.payload.filename],
+            {
+                status: FILE_RETRIEVAL_STATUS.COMPLETED,
+                url: action.payload.url
+            });
+            newState.fileLinkMap[action.payload.filename] = newLinkEntry;
+            return newState;
+        }
+        case "FAIL_FILE_CACHE": {
+            newState.fileCacheMap = Object.assign({}, newState.fileCacheMap);
+            newState.fileCacheMap[action.payload.filename] = {
+                status: FILE_RETRIEVAL_STATUS.FAILED
+            }
+            return newState;
+        }
+        case "FAIL_FILE_LINK": {
+            newState.fileLinkMap = Object.assign({}, newState.fileLinkMap);
+            let newLinkEntry = Object.assign(newState.fileLinkMap[action.payload.filename],
+            {
+                status: FILE_RETRIEVAL_STATUS.FAILED
+            });
+            newState.fileLinkMap[action.payload.filename] = newLinkEntry;
+            return newState;
+        }
+        case "IN_PROGRESS_FILE_CACHE": {
+            newState.fileCacheMap = Object.assign({}, newState.fileCacheMap);
+            let newCacheEntry = Object.assign({}, newState.fileCacheMap[action.payload.filename]);
+            newState.fileCacheMap[action.payload.filename] = {
+                ...newCacheEntry,
+                status: FILE_RETRIEVAL_STATUS.IN_PROGRESS,
+                progress: action.payload.progress
+            }
+            return newState;
+        }
+        // Save issue list
+        case "ISSUE_LIST": {
+            return {
+                ...newState,
+                issueList: action.payload,
+                issueListRequestedTimestamp: Date.now()
+            }
+        }
+        //In app purchases
+        case "PROCESSING_TRANSACTION": {
+            return {
+                ...newState,
+                processingTransaction: action.payload
             }
         }
         case "PURCHASE": {
@@ -72,6 +136,32 @@ const reducer = (state = initialState, action) => {
                 ownedProducts: action.payload
             }
         }
+        case "REMOVE_FILE_CACHE": {
+            newState.fileCacheMap = Object.assign({}, newState.fileCacheMap);
+            delete newState.fileCacheMap[action.payload.filename];
+            return newState;
+        }
+        case "REMOVE_FILE_LINK": {
+            newState.fileLinkMap = Object.assign({}, newState.fileLinkMap);
+            delete newState.fileLinkMap[action.payload.filename];
+            return newState;
+        }
+        case "REQUEST_FILE_CACHE": {
+            newState.fileCacheMap = Object.assign({}, newState.fileCacheMap);
+            newState.fileCacheMap[action.payload.filename] = { 
+                status: FILE_RETRIEVAL_STATUS.REQUESTED,
+                task: action.payload.task
+            };
+            return newState;
+        }
+        case "REQUEST_FILE_LINK": {
+            newState.fileLinkMap = Object.assign({}, newState.fileLinkMap);
+            newState.fileLinkMap[action.payload.filename] = { 
+                status: FILE_RETRIEVAL_STATUS.REQUESTED,
+                requestedTimestamp: Date.now()
+            }
+            return newState;
+        }
         case "REQUESTING": {
             return {
                 ...newState,
@@ -81,90 +171,6 @@ const reducer = (state = initialState, action) => {
                 }
             }
         }
-
-        // Save issue list
-        case "ISSUE_LIST": {
-            return {
-                ...newState,
-                issueList: action.payload,
-                issueListRequestedTimestamp: Date.now()
-            }
-        }
-
-        // File link map actions
-        case "REQUEST_FILE_LINK": {
-            newState.fileLinkMap = Object.assign({}, newState.fileLinkMap);
-            newState.fileLinkMap[action.payload.filename] = { 
-                status: FILE_RETRIEVAL_STATUS.REQUESTED,
-                requestedTimestamp: Date.now()
-            }
-            return newState;
-        }
-        case "COMPLETE_FILE_LINK": {
-            newState.fileLinkMap = Object.assign({}, newState.fileLinkMap);
-            let newLinkEntry = Object.assign(newState.fileLinkMap[action.payload.filename],
-            {
-                status: FILE_RETRIEVAL_STATUS.COMPLETED,
-                url: action.payload.url
-            });
-            newState.fileLinkMap[action.payload.filename] = newLinkEntry;
-            return newState;
-        }
-        case "FAIL_FILE_LINK": {
-            newState.fileLinkMap = Object.assign({}, newState.fileLinkMap);
-            let newLinkEntry = Object.assign(newState.fileLinkMap[action.payload.filename],
-            {
-                status: FILE_RETRIEVAL_STATUS.FAILED
-            });
-            newState.fileLinkMap[action.payload.filename] = newLinkEntry;
-            return newState;
-        }
-        case "REMOVE_FILE_LINK": {
-            newState.fileLinkMap = Object.assign({}, newState.fileLinkMap);
-            delete newState.fileLinkMap[action.payload.filename];
-            return newState;
-        }
-
-        // File cache actions
-        case "REQUEST_FILE_CACHE": {
-            newState.fileCacheMap = Object.assign({}, newState.fileCacheMap);
-            newState.fileCacheMap[action.payload.filename] = { 
-                status: FILE_RETRIEVAL_STATUS.REQUESTED,
-                task: action.payload.task
-            };
-            return newState;
-        }
-        case "COMPLETE_FILE_CACHE": {
-            newState.fileCacheMap = Object.assign({}, newState.fileCacheMap);
-            newState.fileCacheMap[action.payload.filename] = {
-            	status: FILE_RETRIEVAL_STATUS.COMPLETED,
-            	localPath: action.payload.localPath
-            }
-            return newState;
-        }
-        case "FAIL_FILE_CACHE": {
-            newState.fileCacheMap = Object.assign({}, newState.fileCacheMap);
-            newState.fileCacheMap[action.payload.filename] = {
-            	status: FILE_RETRIEVAL_STATUS.FAILED
-            }
-            return newState;
-        }
-        case "IN_PROGRESS_FILE_CACHE": {
-            newState.fileCacheMap = Object.assign({}, newState.fileCacheMap);
-            let newCacheEntry = Object.assign({}, newState.fileCacheMap[action.payload.filename]);
-            newState.fileCacheMap[action.payload.filename] = {
-                ...newCacheEntry,
-                status: FILE_RETRIEVAL_STATUS.IN_PROGRESS,
-                progress: action.payload.progress
-            }
-            return newState;
-        }
-        case "REMOVE_FILE_CACHE": {
-            newState.fileCacheMap = Object.assign({}, newState.fileCacheMap);
-            delete newState.fileCacheMap[action.payload.filename];
-            return newState;
-        }
-
         // Select an issue to focus on
         case "SELECT_ISSUE": {
             if (newState.issueList && action.payload.productId) {
@@ -178,14 +184,6 @@ const reducer = (state = initialState, action) => {
                 newState.selectedIssue = null;
             }
             return newState;
-        }
-
-        //In app purchases
-        case "PROCESSING_TRANSACTION": {
-            return {
-                ...newState,
-                processingTransaction: action.payload
-            }
         }
     	default:
             return state;

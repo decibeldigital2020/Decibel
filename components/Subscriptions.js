@@ -3,16 +3,19 @@ import {
     View
 } from 'react-native';
 import { connect } from 'react-redux';
+import ActiveSubscription from './ActiveSubscription';
 import NewSubscriptions from './NewSubscriptions';
 import { ALL_SUBSCRIPTIONS } from '../constants/products';
 
-const Subscriptions = ({ownedProducts}) => {
-    const isSubscriptionProduct = product => ALL_SUBSCRIPTIONS.includes(product.productId);
+const Subscriptions = ({activeSubscription}) => {
+    if (!!activeSubscription) {
+        return <ActiveSubscription />;
+    }
     return <NewSubscriptions />;
 }
 
 const mapStateToProps = state => ({
-    ownedProducts: state.ownedProducts
+    activeSubscription: state.activeSubscription
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -5,6 +5,7 @@ import {
     requestPurchase, 
     requestSubscription 
 } from 'react-native-iap';
+import { ALL_SUBSCRIPTIONS } from '../constants/products';
 
 export const getAvailableProducts = (skuList) => dispatch => {
     dispatch({
@@ -91,6 +92,12 @@ export const processNewPurchase = purchase => dispatch => {
             purchase
         }
     });
+    if (ALL_SUBSCRIPTIONS.includes(purchase.productId)) {
+        dispatch({
+            type: "ACTIVE_SUBSCRIPTION",
+            payload: purchase
+        });
+    }
     dispatch({
         type: "PROCESSING_TRANSACTION",
         payload: false
@@ -104,7 +111,7 @@ export const requestNewPurchase = sku => dispatch => {
     });
     requestPurchase(sku)
         .then(result => {
-            console.log(result);
+            //console.log(result);
         })
         .catch(err => {
             console.error("requestPurchase", err);
@@ -122,7 +129,7 @@ export const requestNewSubscription = sku => dispatch => {
     });
     requestSubscription(sku)
         .then(result => {
-            console.log(result);
+            //console.log(result);
         })
         .catch(err => {
             console.error("requestSubscription", err);
@@ -143,10 +150,24 @@ export const restorePurchases = () => dispatch => {
     });
     getAvailablePurchases()
         .then(result => {
-            console.log(result);
+            // console.log(result);
             dispatch({
                 type: "RESTORE_PURCHASES",
                 payload: result
+            });
+            let foundActiveSubscription = false;
+            ALL_SUBSCRIPTIONS.map(sku => {
+                if (foundActiveSubscription) {
+                    return;
+                }
+                let index = result.findIndex(p => p.productId === sku);
+                if (index !== -1) {
+                    dispatch({
+                        type: "ACTIVE_SUBSCRIPTION",
+                        payload: result[index]
+                    });
+                    foundActiveSubscription = true;
+                }
             });
             dispatch({
                 type: "REQUESTING",

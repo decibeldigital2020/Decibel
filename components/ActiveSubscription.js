@@ -4,10 +4,11 @@ import {
 } from '../constants/products';
 import {
     ActivityIndicator,
+    Alert,
     Button,
+    Linking,
     StyleSheet,
     Text,
-    TouchableOpacity,
     View
 } from 'react-native';
 import { connect } from 'react-redux';
@@ -16,66 +17,70 @@ import {
     getAvailableSubscriptions as getAvailableSubscriptionsAction,
     requestNewSubscription as requestNewSubscriptionAction
 } from '../actions/iapActions';
-import { getDescription, getPrice } from '../util/subscriptionsUtil';
+import { 
+    getDescription, 
+    getOriginalSubscriptionDate,
+    getPrice,
+    getRecentSubscriptionDate
+} from '../util/subscriptionsUtil';
 
-const FREE_MONTH_PROMO_TEXT = "First Month Free";
-const FINE_PRINT = "Auto-renewing subscription begins after free trial period of one month. Can be cancelled at any time.";
+const HOW_TO_MANAGE_SUBSCRIPTION_TEXT = "To manage your subscription, open the Settings app. Tap your name, tap Subscriptions, then tap the subscription that you want to manage.";
+const MANAGE_SUBSCRIPTION_LINK = "itms-apps://apps.apple.com/account/subscriptions";
 
-const NewSubscriptions = ({availableSubscriptions, getAvailableSubscriptions, requestingSubscriptions, requestNewSubscription}) => {
+const ActiveSubscription = ({activeSubscription, availableSubscriptions, getAvailableSubscriptions, requestingSubscriptions}) => {
     
-    let [selectedSubscription, setSelectedSubscription] = React.useState(ALL_SUBSCRIPTIONS[0]);
-
     React.useEffect(() => {
         if ((!getAvailableSubscriptions || getAvailableSubscriptions.length === 0) && !requestingSubscriptions) {
             getAvailableSubscriptions();
         }
     }, []);
 
+    const originalSubscriptionDate = getOriginalSubscriptionDate(activeSubscription);
+    const recentSubscriptionDate = getRecentSubscriptionDate(activeSubscription);
+
     return <View style={styles.container}>
-        <Text style={styles.headerText}>Subscriptions</Text>
+        <Text style={styles.headerText}>Active Subscription</Text>
         <View style={styles.optionsPanel}>
-            { ALL_SUBSCRIPTIONS.map(sku =>
-                <TouchableOpacity 
-                    onPress={() => 
-                        setSelectedSubscription(sku)}
-                    style={[
-                        styles.subscriptionOption,
-                        selectedSubscription === sku && styles.subscriptionOptionSelected
-                    ]}>
-                    <Text style={styles.subscriptionOptionTitle}>
-                        { getDescription(sku) }
+            <View 
+                style={[styles.subscriptionOption, styles.subscriptionOptionSelected]}>
+                <Text style={styles.subscriptionOptionTitle}>
+                    { getDescription(sku) }
+                </Text>
+                <Text style={styles.subscriptionOptionText}>
+                    Original subscription date: { originalSubscriptionDate }
+                </Text>
+                { originalSubscriptionDate !== recentSubscriptionDate && 
+                    <Text style={styles.subscriptionOptionText}>
+                        Recent subscription date: { recentSubscriptionDate }
                     </Text>
-                    <Text style={styles.subscriptionOptionPrice}>
-                        { FREE_MONTH_PROMO_TEXT }
+                }
+                { !requestingSubscriptions &&
+                    <Text style={styles.subscriptionOptionText}>
+                        { getPrice(availableSubscriptions, sku) }
                     </Text>
-                    { !requestingSubscriptions &&
-                        <Text style={styles.subscriptionOptionPrice}>
-                            { getPrice(availableSubscriptions, sku) }
-                        </Text>
-                    }
-                    { requestingSubscriptions &&
-                        <ActivityIndicator size={"small"} color={styles.activityIndicator.color} style={styles.activityIndicator} />
-                    }
-                </TouchableOpacity>
-            ) }
+                }
+                { requestingSubscriptions &&
+                    <ActivityIndicator size={"small"} color={styles.activityIndicator.color} style={styles.activityIndicator} />
+                }
+            </View>
         </View>
-        <View style={[styles.subscribeButton, selectedSubscription ? styles.subscribeButtonActive : styles.subscribeButtonPassive]}>
+        <View style={[styles.subscribeButton, styles.subscribeButtonActive]}>
             <Button
-                color={styleConstants.button.color} 
-                disabled={!selectedSubscription}
-                onPress={() => requestNewSubscription(selectedSubscription)}
-                style={styleConstants.buttonStretch}
-                title="Subscribe" />
-        </View>
-        <View style={styles.finePrint}>
-            <Text style={styles.finePrintText}>
-                { FINE_PRINT }
-            </Text>
+                color={styleConstants.button.color}
+                onPress={async () => {
+                    const supported = await Linking.canOpenURL(MANAGE_SUBSCRIPTION_LINK);
+                    if (supported) {
+                        Linking.openURL(MANAGE_SUBSCRIPTION_LINK);
+                    } else {
+                        Alert(HOW_TO_MANAGE_SUBSCRIPTION_TEXT);
+                    }
+                }}
+                title="Manage Subscription" />
         </View>
     </View>;
 };
 
-NewSubscriptions.defaultProps = {
+ActiveSubscription.defaultProps = {
     requestingSubscriptions: false
 };
 
@@ -89,17 +94,6 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         height: "100%",
         backgroundColor: "#000"
-    },
-    finePrint: {
-        flex: 1,
-        flexDirection: "row",
-        justifyContent: "center",
-        marginBottom: 16,
-        marginTop: 12,
-    },
-    finePrintText: {
-        color: "#FFF",
-        margin: 12
     },
     headerText: {
         fontWeight: "800",
@@ -120,13 +114,11 @@ const styles = StyleSheet.create({
         margin: 12,
         flex: 1,
         flexDirection: "row",
+        justifyContent: "center",
         maxHeight: 40
     },
     subscribeButtonActive: {
         backgroundColor: styleConstants.actionButton.color
-    },
-    subscribeButtonPassive: {
-        backgroundColor: styleConstants.passiveButton.color,
     },
     subscriptionOption: {
         backgroundColor: "#AAA",
@@ -137,7 +129,7 @@ const styles = StyleSheet.create({
         borderWidth: 6,
         borderColor: "#000"
     },
-    subscriptionOptionPrice: {
+    subscriptionOptionText: {
         fontWeight: "400",
         fontSize: 18,
         marginBottom: 6,
@@ -160,6 +152,7 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => ({
+    activeSubscription: state.activeSubscription,
     availableSubscriptions: state.availableSubscriptions,
     requestingSubscriptions: state.requesting.subscriptions
 });
@@ -169,4 +162,4 @@ const mapDispatchToProps = dispatch => ({
     requestNewSubscription: sku => dispatch(requestNewSubscriptionAction(sku))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(NewSubscriptions);
+export default connect(mapStateToProps, mapDispatchToProps)(ActiveSubscription);
