@@ -1,6 +1,7 @@
 import React from 'react';
 import {
     Button,
+    StyleSheet,
     View
 } from 'react-native';
 import { connect } from 'react-redux';

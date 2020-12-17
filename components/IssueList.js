@@ -17,6 +17,7 @@ import { MAX_ISSUE_LIST_AGE } from '../constants';
 import { styleConstants } from '../constants/styles';
 import SplashScreen from 'react-native-splash-screen';
 import { getIssueFilename } from '../util/fileRetrievalUtil';
+import { getFirstUnlockedPublishTimestamp } from '../util/subscriptionsUtil';
 import {
     ALL_SUBSCRIPTIONS
 } from '../constants/products';
@@ -30,6 +31,7 @@ const issueListIsAlive = issueListRequestedTimestamp =>
     (issueListRequestedTimestamp + MAX_ISSUE_LIST_AGE) >= Date.now();
 
 const IssueList = ({ 
+    activeSubscription,
     availableProducts,
     availableSubscriptions,
     downloadsOnly, 
@@ -72,6 +74,8 @@ const IssueList = ({
         return null;
     }
 
+    const firstUnlockedPublishTimestamp = getFirstUnlockedPublishTimestamp(activeSubscription, issueList);
+
     const getProduct = (issue) => {
         if (!availableProducts || availableProducts.length === 0) {
             return null;
@@ -89,11 +93,12 @@ const IssueList = ({
         if (ownedProducts[issue.sku]) {
             return ownedProducts[issue.sku];
         } else {
-            return null; // TODO return subscription receipt
+            return activeSubscription;
         }
     }
 
-    const subscriptionIncludesIssue = (issue) => false;
+    const subscriptionIncludesIssue = (issue) => 
+        new Date(issue.publish_timestamp).getTime() >= firstUnlockedPublishTimestamp;
 
     const isIssueOwned = (issue) => 
         Object.keys(ownedProducts).includes(issue.sku) || subscriptionIncludesIssue(issue);
@@ -185,6 +190,7 @@ IssueList.defaultProps = {
 }
 
 const mapStateToProps = state => ({
+    activeSubscription: state.activeSubscription,
     availableProducts: state.availableProducts,
     availableSubscriptions: state.availableSubscriptions,
     fileCacheMap: state.fileCacheMap,

@@ -1,4 +1,4 @@
-import { ENDPOINT_RESOURCE_LAMBDA } from '../constants';
+import { ENDPOINT_RESOURCE_LAMBDA, RESOURCE_TYPE } from '../constants';
 import RNFetchBlob from 'rn-fetch-blob';
 import {
     getPreviewPdfFilename,
@@ -140,6 +140,9 @@ export const getResource = (uploadTimestamp, resourceType, page, receipt) => dis
         //console.log("Received response", response);
         if (response.status !== 200) {
             console.error("Status not 200", response.status);
+            if (response.status === 401 && resourceType === RESOURCE_TYPE.ISSUE) {
+                dispatch(invalidateActiveSubscription());
+            }
             throw new Error(response);
         }
         return response.json();
@@ -152,6 +155,13 @@ export const getResource = (uploadTimestamp, resourceType, page, receipt) => dis
         let url = responseJson.url;
         fetchResource(dispatch, filename, url);
     }).catch(err => failFileCache(err, dispatch, filename));
+}
+
+export const invalidateActiveSubscription = () => dispatch => {
+    dispatch({
+        type: "ACTIVE_SUBSCRIPTION",
+        payload: null
+    });
 }
 
 export const removeResource = (filename) => dispatch => {
