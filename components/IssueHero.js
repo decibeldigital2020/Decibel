@@ -6,7 +6,7 @@ import {
     presignedUrlIsAlive
 } from '../util/fileRetrievalUtil';
 import {
-    getResourceFromUrl as getResourceFromUrlAction,
+    getResourceFromLink as getResourceFromLinkAction,
     getResource as getResourceAction 
 } from '../actions/fileRetrievalActions';
 import { 
@@ -20,7 +20,7 @@ import { styleConstants } from '../constants/styles';
 import ErrorHelperText from './ErrorHelperText';
 
 
-const IssueHero = ({fileCacheMap, fileLinkMap, getResource, getResourceFromUrl, uploadTimestamp, visible}) => {
+const IssueHero = ({fileCacheMap, fileLinkMap, getResource, getResourceFromLink, uploadTimestamp, visible}) => {
 
     const filename = getHeroFilename(uploadTimestamp);
 
@@ -32,7 +32,7 @@ const IssueHero = ({fileCacheMap, fileLinkMap, getResource, getResourceFromUrl, 
             if (fileLinkMap[filename] 
                     && fileLinkMap[filename].status === FILE_RETRIEVAL_STATUS.COMPLETED 
                     && presignedUrlIsAlive(fileLinkMap[filename].requestedTimestamp)) {
-                getResourceFromUrl(fileLinkMap[filename].url);
+                getResourceFromLink(fileLinkMap[filename].url);
             } else if (fileLinkMap[filename] && fileLinkMap[filename].status === FILE_RETRIEVAL_STATUS.REQUESTED) {
                 // Do nothing, wait for url fetch to complete
                 return;
@@ -95,7 +95,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
     getResource: (uploadTimestamp, resourceType) => dispatch(getResourceAction(uploadTimestamp, resourceType)),
-    getResourceFromUrl: (url) => dispatch(getResourceFromUrl(url))
+    getResourceFromLink: (url) => dispatch(getResourceFromLinkAction(url))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(IssueHero);

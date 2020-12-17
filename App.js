@@ -25,7 +25,7 @@ const persistedReducerConfig = {
   storage: AsyncStorage
 };
 const persistedReducer = persistReducer(persistedReducerConfig, reducer);
-const store = createStore(persistedReducer, applyMiddleware(thunk));
+let store = createStore(persistedReducer, applyMiddleware(thunk));
 const persistor = persistStore(store);
 
 const App = () => {
@@ -34,7 +34,7 @@ const App = () => {
       <PersistGate loading={null} persistor={persistor}>
         <SafeAreaView style={styles.container}>
           <StatusBar barStyle="light-content" backgroundColor={styleConstants.statusBar.backgroundColor} />
-          <InAppPurchaseHandler />
+          { !__DEV__ && <InAppPurchaseHandler /> }
           <Navigation />
           <ProcessingTransaction />
         </SafeAreaView>

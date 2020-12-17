@@ -14,9 +14,6 @@ export const styleConstants = {
     issueName: {
         color: "#000"
     },
-    errorHelperText: {
-        color: "#00F"
-    },
     icon: {
         color: "#000"
     },

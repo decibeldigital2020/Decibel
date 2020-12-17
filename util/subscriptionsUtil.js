@@ -32,6 +32,9 @@ export const getRecentSubscriptionDate = activeSubscription => {
 }
 
 export const getFirstUnlockedPublishTimestamp = (activeSubscription, issueList) => {
+    if (!activeSubscription || !issueList || issueList.length === 0) {
+        return null;
+    }
     let subscriptionDate = activeSubscription.originalTransactionDateIOS;
     let firstUnlockedIssueIndex;
     issueList.map((issue, index) => {

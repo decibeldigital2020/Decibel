@@ -1,11 +1,43 @@
 import {
-    getAvailablePurchases,
-    getProducts,
-    getSubscriptions,
-    requestPurchase, 
-    requestSubscription 
+    getAvailablePurchases as getAvailablePurchasesAction,
+    getProducts as getProductsAction,
+    getSubscriptions as getSubscriptionsAction,
+    requestPurchase as requestPurchaseAction, 
+    requestSubscription as requestSubscriptionAction 
 } from 'react-native-iap';
 import { ALL_SUBSCRIPTIONS } from '../constants/products';
+import {
+    availablePurchasesMock,
+    availableSubscriptionsMock,
+    getAvailableProductsMock,
+    getNewPurchaseMock
+} from '../mocks/iapMocks';
+
+let getAvailablePurchases;
+let getProducts;
+let getSubscriptions;
+let requestPurchase;
+let requestSubscription;
+
+if (__DEV__) {
+    getAvailablePurchases = () => new Promise((res, rej) => res(availablePurchasesMock));
+    getProducts = (skuList) => new Promise((res, rej) => res(getAvailableProductsMock(skuList)));
+    getSubscriptions = (skuList) => new Promise((res, rej) => res(availableSubscriptionsMock));
+    requestPurchase = (sku) => new Promise((res, rej) => {
+        processNewPurchase(getNewPurchaseMock(sku));
+        res();
+    });
+    requestSubscription = (sku) => new Promise((res, rej) => {
+        processNewPurchase(getNewPurchaseMock(sku));
+        res();
+    });
+} else {
+    getAvailablePurchases = getAvailablePurchasesAction;
+    getProducts = getProductsAction;
+    getSubscriptions = getSubscriptionsAction;
+    requestPurchase = requestPurchaseAction;
+    requestSubscription = requestSubscriptionAction;
+}
 
 export const getAvailableProducts = (skuList) => dispatch => {
     dispatch({

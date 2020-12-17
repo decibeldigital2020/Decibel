@@ -36,6 +36,7 @@ const NewSubscriptions = ({availableSubscriptions, getAvailableSubscriptions, re
         <View style={styles.optionsPanel}>
             { ALL_SUBSCRIPTIONS.map(sku =>
                 <TouchableOpacity 
+                    key={`${sku}_subscription_option`}
                     onPress={() => 
                         setSelectedSubscription(sku)}
                     style={[
@@ -120,6 +121,7 @@ const styles = StyleSheet.create({
         margin: 12,
         flex: 1,
         flexDirection: "row",
+        justifyContent: "center",
         maxHeight: 40
     },
     subscribeButtonActive: {

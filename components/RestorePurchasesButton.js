@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
         margin: 12,
         flex: 1,
         flexDirection: "row",
+        justifyContent: "center",
         maxHeight: 40,
         backgroundColor: styleConstants.passiveButton.color,
     },

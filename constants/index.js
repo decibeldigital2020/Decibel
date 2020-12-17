@@ -1,6 +1,7 @@
 export const ENDPOINT_ISSUE_LIST_LAMBDA = "https://hg0yi3q9vb.execute-api.us-east-1.amazonaws.com/production/issuelist";
 export const ENDPOINT_RESOURCE_LAMBDA = "https://f5md774521.execute-api.us-east-1.amazonaws.com/production/resource";
 export const MANAGE_SUBSCRIPTIONS_URL_IOS = "https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/manageSubscriptions";
+export const DECIBEL_HELP_URL = "https://www.decibelmagazine.com/about/staff/";
 export const FILE_RETRIEVAL_STATUS = {
     REQUESTED: "requested",
     IN_PROGRESS: "in_progress",

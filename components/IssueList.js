@@ -13,7 +13,7 @@ import {
 import { connect } from 'react-redux';
 import { getIssueList as getIssueListAction } from '../actions/issueListActions';
 import IssueListItem from './IssueListItem';
-import { MAX_ISSUE_LIST_AGE } from '../constants';
+import { FILE_RETRIEVAL_STATUS, MAX_ISSUE_LIST_AGE } from '../constants';
 import { styleConstants } from '../constants/styles';
 import SplashScreen from 'react-native-splash-screen';
 import { getIssueFilename } from '../util/fileRetrievalUtil';
@@ -77,13 +77,13 @@ const IssueList = ({
     const firstUnlockedPublishTimestamp = getFirstUnlockedPublishTimestamp(activeSubscription, issueList);
 
     const getProduct = (issue) => {
-        if (!availableProducts || availableProducts.length === 0) {
-            return null;
+        if (!!availableProducts && availableProducts.length > 0) {
+            let index = availableProducts.findIndex(p => p.productId === issue.sku);
+            if (index !== -1) {
+                return availableProducts[index];
+            }
         }
-        let index = availableProducts.findIndex(p => p.productId === issue.sku);
-        if (index !== -1) {
-            return availableProducts[index];
-        }
+        return null;
     }
 
     const getPurchase = issue => {
@@ -98,13 +98,16 @@ const IssueList = ({
     }
 
     const subscriptionIncludesIssue = (issue) => 
-        new Date(issue.publish_timestamp).getTime() >= firstUnlockedPublishTimestamp;
+        !!firstUnlockedPublishTimestamp && (new Date(issue.publish_timestamp).getTime() >= firstUnlockedPublishTimestamp);
 
     const isIssueOwned = (issue) => 
         Object.keys(ownedProducts).includes(issue.sku) || subscriptionIncludesIssue(issue);
 
     const data = !!downloadsOnly 
-        ? issueList.issues.filter(issue => Object.keys(fileCacheMap).includes(getIssueFilename(issue.upload_timestamp)))
+        ? issueList.issues.filter(issue => 
+            Object.keys(fileCacheMap)
+                .filter(filename => fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.COMPLETED)
+                .includes(getIssueFilename(issue.upload_timestamp)))
         : (!!ownedOnly
             ? issueList.issues.filter(isIssueOwned)
             : issueList.issues);

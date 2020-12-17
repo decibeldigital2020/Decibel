@@ -10,7 +10,7 @@ import LogoTitle from './LogoTitle';
 
 const ProcessingTransaction = ({processingTransaction, requesting}) => {
 
-    const isModalVisible = () => processingTransaction || requesting.purchases;
+    const isModalVisible = () => !!processingTransaction || !!requesting.purchases;
 
     return <Modal
         animationType="slide"
