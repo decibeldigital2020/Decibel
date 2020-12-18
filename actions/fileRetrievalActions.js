@@ -9,8 +9,10 @@ import {
     presignedUrlIsAlive,
     getFilenameFromUrl
 } from '../util/fileRetrievalUtil';
+import { Alert } from 'react-native';
 
-const getResourceErrorMessage = "There was a problem downloading the requested item. Please try again in a few minutes.";
+const INVALIDATED_SUBSCRIPTION_ERROR_MSG = "You do not have access to download this issue. If your subscription is active, go to the Help page to restore your purchases.";
+
 const headers = {
     'Content-Type': 'application/json'
 };
@@ -20,12 +22,6 @@ const PROGRESS_FACTOR = 100;
 const failFileCache = (err, dispatch, filename) => {
     // console.error("Error fetching resource", JSON.stringify(err));
     dispatch({ type: "FAIL_FILE_CACHE", payload: { filename }});
-    dispatch({
-        type: "ERROR",
-        payload: {
-            message: getResourceErrorMessage
-        }
-    });
 }
 
 const getFilePath = (filename) => (RNFetchBlob.fs.dirs.DocumentDir + "/" + filename);
@@ -141,6 +137,7 @@ export const getResource = (uploadTimestamp, resourceType, page, receipt) => dis
         if (response.status !== 200) {
             console.error("Status not 200", response.status);
             if (response.status === 401 && resourceType === RESOURCE_TYPE.ISSUE) {
+                Alert.alert("Error", INVALIDATED_SUBSCRIPTION_ERROR_MSG);
                 dispatch(invalidateActiveSubscription());
             }
             throw new Error(response);

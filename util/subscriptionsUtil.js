@@ -32,18 +32,20 @@ export const getRecentSubscriptionDate = activeSubscription => {
 }
 
 export const getFirstUnlockedPublishTimestamp = (activeSubscription, issueList) => {
-    if (!activeSubscription || !issueList || issueList.length === 0) {
+    if (!activeSubscription || !issueList || issueList.issues.length === 0) {
         return null;
     }
     let subscriptionDate = activeSubscription.originalTransactionDateIOS;
-    let firstUnlockedIssueIndex;
-    issueList.map((issue, index) => {
-        if (!index && new Date(issue.publish_timestamp).getTime() <= subscriptionDate) {
+    let firstUnlockedIssueIndex = null;
+    for(let index = 0; index < issueList.issues.length; index++) {
+        let issue = issueList.issues[index];
+        if (firstUnlockedIssueIndex !== null && new Date(issue.publish_timestamp).getTime() <= subscriptionDate) {
             firstUnlockedIssueIndex = index;
+            break;
         }
-    });
-    if (!firstUnlockedIssueIndex) {
-        firstUnlockedIssueIndex = issueList.length - 1;
     }
-    return new Date(issueList[firstUnlockedIssueIndex].publish_timestamp).getTime();
+    if (!firstUnlockedIssueIndex) {
+        firstUnlockedIssueIndex = issueList.issues.length - 1;
+    }
+    return new Date(issueList.issues[firstUnlockedIssueIndex].publish_timestamp).getTime();
 }

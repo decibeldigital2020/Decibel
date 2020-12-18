@@ -44,7 +44,7 @@ const ActiveSubscription = ({activeSubscription, availableSubscriptions, getAvai
             <View 
                 style={[styles.subscriptionOption, styles.subscriptionOptionSelected]}>
                 <Text style={styles.subscriptionOptionTitle}>
-                    { getDescription(sku) }
+                    { getDescription(activeSubscription.productId) }
                 </Text>
                 <Text style={styles.subscriptionOptionText}>
                     Original subscription date: { originalSubscriptionDate }
@@ -56,7 +56,7 @@ const ActiveSubscription = ({activeSubscription, availableSubscriptions, getAvai
                 }
                 { !requestingSubscriptions &&
                     <Text style={styles.subscriptionOptionText}>
-                        { getPrice(availableSubscriptions, sku) }
+                        { getPrice(availableSubscriptions, activeSubscription.productId) }
                     </Text>
                 }
                 { requestingSubscriptions &&
@@ -72,7 +72,7 @@ const ActiveSubscription = ({activeSubscription, availableSubscriptions, getAvai
                     if (supported) {
                         Linking.openURL(MANAGE_SUBSCRIPTION_LINK);
                     } else {
-                        Alert(HOW_TO_MANAGE_SUBSCRIPTION_TEXT);
+                        Alert.alert("Subscription", HOW_TO_MANAGE_SUBSCRIPTION_TEXT);
                     }
                 }}
                 title="Manage Subscription" />

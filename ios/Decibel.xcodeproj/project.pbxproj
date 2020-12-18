@@ -16,6 +16,8 @@
 		8537784B25737203000EBFB7 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8537784A25737203000EBFB7 /* Launch Screen.storyboard */; };
 		853778592573AF96000EBFB7 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 853778582573AF96000EBFB7 /* Launch Screen.storyboard */; };
 		858DAF53257F552900C056DF /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 858DAF52257F552900C056DF /* StoreKit.framework */; };
+		85DF70EE258C655C00E57CF6 /* AppIcons in Resources */ = {isa = PBXBuildFile; fileRef = 85DF70ED258C655C00E57CF6 /* AppIcons */; };
+		85DF70F2258C669E00E57CF6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 85DF70F1258C669E00E57CF6 /* Assets.xcassets */; };
 		8C44E899848645D885A5BBEE /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FFDBC961DB834016B53B2ECC /* Ionicons.ttf */; };
 /* End PBXBuildFile section */
 
@@ -51,6 +53,8 @@
 		8537784A25737203000EBFB7 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		853778582573AF96000EBFB7 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		858DAF52257F552900C056DF /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		85DF70ED258C655C00E57CF6 /* AppIcons */ = {isa = PBXFileReference; lastKnownFileType = folder; name = AppIcons; path = Decibel/AppIcons; sourceTree = "<group>"; };
+		85DF70F1258C669E00E57CF6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA629442CDE2983985A6CBBB /* Pods-Decibel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Decibel.release.xcconfig"; path = "Target Support Files/Pods-Decibel/Pods-Decibel.release.xcconfig"; sourceTree = "<group>"; };
 		C329D57159E358D5CDAD1A16 /* Pods-Decibel-DecibelTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Decibel-DecibelTests.debug.xcconfig"; path = "Target Support Files/Pods-Decibel-DecibelTests/Pods-Decibel-DecibelTests.debug.xcconfig"; sourceTree = "<group>"; };
 		D419D0823B51B6D9347FEA48 /* Pods-Decibel-DecibelTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Decibel-DecibelTests.release.xcconfig"; path = "Target Support Files/Pods-Decibel-DecibelTests/Pods-Decibel-DecibelTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -120,7 +124,9 @@
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
+				85DF70F1258C669E00E57CF6 /* Assets.xcassets */,
 				853778582573AF96000EBFB7 /* Launch Screen.storyboard */,
+				85DF70ED258C655C00E57CF6 /* AppIcons */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB71A68108700A75B9A /* main.m */,
 			);
@@ -277,8 +283,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				85DF70EE258C655C00E57CF6 /* AppIcons in Resources */,
 				8537784B25737203000EBFB7 /* Launch Screen.storyboard in Resources */,
 				853778592573AF96000EBFB7 /* Launch Screen.storyboard in Resources */,
+				85DF70F2258C669E00E57CF6 /* Assets.xcassets in Resources */,
 				8C44E899848645D885A5BBEE /* Ionicons.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -479,7 +487,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4F8C951892C586A8FB0A1C73 /* Pods-Decibel.debug.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = DecibelAppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = SWP56E4Z8Z;
@@ -496,6 +504,7 @@
 				PRODUCT_NAME = Decibel;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -504,7 +513,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = AA629442CDE2983985A6CBBB /* Pods-Decibel.release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = DecibelAppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = SWP56E4Z8Z;
@@ -519,6 +528,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.redflagmedia.decibelmagazine;
 				PRODUCT_NAME = Decibel;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
