@@ -35,7 +35,16 @@ export const getFirstUnlockedPublishTimestamp = (activeSubscription, issueList) 
     if (!activeSubscription || !issueList || issueList.issues.length === 0) {
         return null;
     }
-    let subscriptionDate = activeSubscription.originalTransactionDateIOS;
+    let transactionDate = activeSubscription.transactionDate;
+    let originalDate = activeSubscription.originalTransactionDateIOS;
+    let subscriptionDate;
+    if (typeof originalDate === 'number' && typeof transactionDate === 'number') {
+        subscriptionDate = Math.min(active);
+    } else if (typeof originalDate === 'number') {
+        subscriptionDate = originalDate;
+    } else {
+        subscriptionDate = transactionDate;
+    }
     let firstUnlockedIssueIndex = null;
     for(let index = 0; index < issueList.issues.length; index++) {
         let issue = issueList.issues[index];

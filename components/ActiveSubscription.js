@@ -46,10 +46,12 @@ const ActiveSubscription = ({activeSubscription, availableSubscriptions, getAvai
                 <Text style={styles.subscriptionOptionTitle}>
                     { getDescription(activeSubscription.productId) }
                 </Text>
-                <Text style={styles.subscriptionOptionText}>
-                    Original subscription date: { originalSubscriptionDate }
-                </Text>
-                { originalSubscriptionDate !== recentSubscriptionDate && 
+                { !!originalSubscriptionDate &&
+                    <Text style={styles.subscriptionOptionText}>
+                        Original subscription date: { originalSubscriptionDate }
+                    </Text>
+                }
+                { !!recentSubscriptionDate && originalSubscriptionDate !== recentSubscriptionDate && 
                     <Text style={styles.subscriptionOptionText}>
                         Recent subscription date: { recentSubscriptionDate }
                     </Text>
