@@ -1,8 +1,9 @@
 import React from 'react';
 import Pdf from 'react-native-pdf';
 import { StyleSheet } from 'react-native';
+import { connect } from 'react-redux';
 
-const PdfViewer = ({ resource }) => {
+const PdfViewer = ({ cacheKey, failFileCache, resource }) => {
 
     const source = { uri: resource };
 
@@ -14,6 +15,7 @@ const PdfViewer = ({ resource }) => {
         style={styles.container}
         onError={(error) => {
             console.error("PdfViewer", error);
+            failFileCache(cacheKey);
         }}
     />;
 };
@@ -25,4 +27,10 @@ const styles = StyleSheet.create({
     }
 });
 
-export default PdfViewer;
+const mapStateToProps = state => ({});
+
+const mapDispatchToProps = dispatch => ({
+    failFileCache: (filename) => dispatch({ type: "FAIL_FILE_CACHE", payload: { filename }})
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(PdfViewer);
