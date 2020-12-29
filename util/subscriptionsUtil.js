@@ -39,7 +39,7 @@ export const getFirstUnlockedPublishTimestamp = (activeSubscription, issueList) 
     let originalDate = activeSubscription.originalTransactionDateIOS;
     let subscriptionDate;
     if (typeof originalDate === 'number' && typeof transactionDate === 'number') {
-        subscriptionDate = Math.min(active);
+        subscriptionDate = Math.min(originalDate, transactionDate);
     } else if (typeof originalDate === 'number') {
         subscriptionDate = originalDate;
     } else {
