@@ -45,7 +45,10 @@ const ViewIssue = ({ cancelGetResource, fileCacheMap, getResource, navigation, p
     return <View style={styles.container}>
         { fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.COMPLETED &&
             <React.Fragment>
-                <PdfViewer cacheKey={filename} resource={fileCacheMap[filename].localPath} />
+                <PdfViewer 
+                    cacheKey={filename} 
+                    navigation={navigation}
+                    resource={fileCacheMap[filename].localPath} />
                 <Button
                     color={styleConstants.passiveButton.color}
                     onPress={() => {

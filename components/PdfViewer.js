@@ -3,7 +3,7 @@ import Pdf from 'react-native-pdf';
 import { StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
 
-const PdfViewer = ({ cacheKey, failFileCache, resource }) => {
+const PdfViewer = ({ cacheKey, failFileCache, navigation, resource }) => {
 
     const source = { uri: resource };
 
@@ -16,6 +16,7 @@ const PdfViewer = ({ cacheKey, failFileCache, resource }) => {
         onError={(error) => {
             console.error("PdfViewer", error);
             failFileCache(cacheKey);
+            navigation && navigation.goBack && navigation.goBack();
         }}
     />;
 };

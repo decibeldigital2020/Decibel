@@ -97,8 +97,12 @@ const IssueList = ({
         }
     }
 
-    const subscriptionIncludesIssue = (issue) => 
-        !!firstUnlockedPublishTimestamp && (new Date(issue.publish_timestamp).getTime() >= firstUnlockedPublishTimestamp);
+    const subscriptionIncludesIssue = (issue) =>
+        !!activeSubscription && 
+            !!issue.subscription_associations && 
+            issue.subscription_associations.map(sa => sa.sku).includes(activeSubscription.productId) &&
+            !!firstUnlockedPublishTimestamp && 
+            (new Date(issue.publish_timestamp).getTime() >= firstUnlockedPublishTimestamp);
 
     const isIssueOwned = (issue) => 
         Object.keys(ownedProducts).includes(issue.sku) || subscriptionIncludesIssue(issue);
