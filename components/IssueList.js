@@ -126,7 +126,7 @@ const IssueList = ({
                     refreshing={requestingIssueList}
                     renderItem={(issue) => 
                         <IssueListItem 
-                            controlAccordion={[0, 1, 2].map(i => issueList.issues[i].product_id).includes(issue.item.product_id)}
+                            controlAccordion={issueList.issues.length > 2 && [0, 1, 2].map(i => issueList.issues[i].product_id).includes(issue.item.product_id)}
                             downloaded={!!downloadsOnly}
                             issue={issue.item} 
                             navigation={navigation} 
