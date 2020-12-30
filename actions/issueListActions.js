@@ -1,5 +1,6 @@
 import { ENDPOINT_ISSUE_LIST_LAMBDA, HEROS_TO_PREFETCH, HEROS_TO_PREFETCH_URL, RESOURCE_TYPE } from "../constants";
 import { getResource, getResourceLink } from './fileRetrievalActions';
+import { getAvailableProducts } from './iapActions';
 
 export const getIssueList = () => (dispatch) => {
     const getIssueListErrorMessage = "There was a problem getting the list of issues. Try again in a few minutes.";
@@ -45,6 +46,9 @@ export const getIssueList = () => (dispatch) => {
         responseJson.issues.slice(HEROS_TO_PREFETCH, HEROS_TO_PREFETCH + HEROS_TO_PREFETCH_URL).forEach(issue => 
             dispatch(getResourceLink(issue.upload_timestamp, RESOURCE_TYPE.HERO))
         );
+
+        // Fetch apple store product info
+        dispatch(getAvailableProducts(responseJson.issues.map(issue => issue.sku)));
     }).catch(err => {
         //console.log(err);
         dispatch({

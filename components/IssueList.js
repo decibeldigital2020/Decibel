@@ -21,10 +21,7 @@ import { getFirstUnlockedPublishTimestamp } from '../util/subscriptionsUtil';
 import {
     ALL_SUBSCRIPTIONS
 } from '../constants/products';
-import {
-    getAvailableProducts as getAvailableProductsAction,
-    getAvailableSubscriptions as getAvailableSubscriptionsAction
-} from '../actions/iapActions';
+import { getAvailableSubscriptions as getAvailableSubscriptionsAction } from '../actions/iapActions';
 import RestorePurchasesButton from './RestorePurchasesButton';
 
 const issueListIsAlive = issueListRequestedTimestamp => 
@@ -35,8 +32,7 @@ const IssueList = ({
     availableProducts,
     availableSubscriptions,
     downloadsOnly, 
-    fileCacheMap, 
-    getAvailableProducts,
+    fileCacheMap,
     getAvailableSubscriptions,
     getIssueList, 
     issueList, 
@@ -54,12 +50,6 @@ const IssueList = ({
             getIssueList();
         }
     }, []);
-
-    React.useEffect(() => {
-        if (!!issueList && !requestingProducts && (!availableProducts || availableProducts.length === 0)) {
-            getAvailableProducts(issueList.issues.map(issue => issue.sku));
-        }
-    }, [issueList]);
 
     React.useEffect(() => {
         if (!!availableProducts && availableProducts.length > 0) {
@@ -134,7 +124,7 @@ const IssueList = ({
                             product={getProduct(issue.item)}
                             purchase={getPurchase(issue.item)}
                             />}
-                    keyExtractor={issue => issue.issue_number.toString()}
+                    keyExtractor={issue => issue.sku}
                     showsVerticalScrollIndicator={false}
                 />
             }
@@ -210,7 +200,6 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    getAvailableProducts: (skuList) => dispatch(getAvailableProductsAction(skuList)),
     getAvailableSubscriptions: () => dispatch(getAvailableSubscriptionsAction(ALL_SUBSCRIPTIONS)),
     getIssueList: () => dispatch(getIssueListAction())
 });

@@ -85,7 +85,9 @@ const IssueListItem = ({
     return <View style={styles.issueListItemContainer}>
         <TouchableOpacity style={styles.issueListItem} onPress={toggleAccordion}>
             <View style={styles.issueNumberContainer}>
-                <Text style={styles.issueNumber}>{ issue.issue_number.toString() }</Text>
+                { !!issue.issue_number && 
+                    <Text style={styles.issueNumber}>{ issue.issue_number.toString() }</Text>
+                }
             </View>
             <View style={styles.issueTitleContainer}>
                 <Text style={styles.displayDate}>{ issue.display_date }</Text>
