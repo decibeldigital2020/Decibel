@@ -45,19 +45,13 @@ const IssueListItem = ({
 
     const [accordionOpen, setAccordionOpen] = React.useState(controlAccordion || false);
     const [bodySectionHeight, setBodySectionHeight] = React.useState(0);
-    const animatedController = React.useRef(new Animated.Value(!!controlAccordion ? 1 : 0)).current;
+    const animatedController = React.useRef(new Animated.Value(controlAccordion ? 1 : 0)).current;
     const [deleteConfirmationModalOpen, setDeleteConfirmationModalOpen] = React.useState(false);
 
     const accordionHeight = animatedController.interpolate({
         inputRange: [0, 1],
         outputRange: [0, bodySectionHeight],
     });
-
-    React.useEffect(() => {
-        if (accordionOpen !== controlAccordion && typeof controlAccordion === "boolean") {
-            toggleAccordion(controlAccordion);
-        }
-    }, [controlAccordion]);
 
     const getPrice = () => 
         product 
@@ -69,8 +63,8 @@ const IssueListItem = ({
             ? purchase.transactionReceipt
             : null;
 
-    const toggleAccordion = (newValue=false) => {
-        newValue = newValue || !accordionOpen;
+    const toggleAccordion = () => {
+        let newValue = !accordionOpen;
         Animated.timing(animatedController, {
             duration: ACCORDION_DURATION,
             toValue: (accordionOpen) ? 0 : 1,
