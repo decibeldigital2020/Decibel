@@ -78,11 +78,12 @@ const IssueList = ({
     }
 
     const getPurchase = issue => {
-        if (!ownedProducts) {
+        if (!ownedProducts || !ownedProducts.length) {
             return null;
         }
-        if (ownedProducts[issue.sku]) {
-            return ownedProducts[issue.sku];
+        let index = ownedProducts.findIndex(product => product.productId === issue.sku);
+        if (index !== -1) {
+            return ownedProducts[index];
         } else {
             return activeSubscription;
         }
@@ -96,7 +97,7 @@ const IssueList = ({
             (new Date(issue.publish_timestamp).getTime() >= firstUnlockedPublishTimestamp);
 
     const isIssueOwned = (issue) => 
-        Object.keys(ownedProducts).includes(issue.sku) || subscriptionIncludesIssue(issue);
+        (ownedProducts && ownedProducts.length && ownedProducts.findIndex(product => product.productId === issue.sku) !== -1) || subscriptionIncludesIssue(issue);
 
     const data = !!downloadsOnly 
         ? issueList.issues.filter(issue => 

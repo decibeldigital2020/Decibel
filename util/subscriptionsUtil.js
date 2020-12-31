@@ -49,7 +49,7 @@ export const getFirstUnlockedPublishTimestamp = (activeSubscription, issueList) 
     let sortedIssueList = issueList.issues.sort((a, b) => a.publish_timestamp > b.publish_timestamp ? -1 : 1);
     for(let index = 0; index < sortedIssueList.length; index++) {
         let issue = sortedIssueList[index];
-        if (firstUnlockedIssueIndex !== null && new Date(issue.publish_timestamp).getTime() <= subscriptionDate) {
+        if (firstUnlockedIssueIndex === null && new Date(issue.publish_timestamp).getTime() <= subscriptionDate) {
             firstUnlockedIssueIndex = index;
             break;
         }

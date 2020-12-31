@@ -27,11 +27,11 @@ const initialState = {
     },
     issueList: null, // See mocks.issueListResponse
     issueListRequestedTimestamp: 0,
-    ownedProducts: {
+    ownedProducts: [
         /*
-         * product_sku: IAP.Purchase
+         * IAP.Purchase
          */
-    },
+    ],
     ownedProductsRequestedTimestamp: 0,
     processingTransaction: false,
     requesting: {
@@ -123,8 +123,8 @@ const reducer = (state = initialState, action) => {
             }
         }
         case "PURCHASE": {
-            let newOwnedProducts = Object.assign({}, newState.ownedProducts);
-            newOwnedProducts[action.payload.sku] = action.payload.purchase;
+            let newOwnedProducts = [...newState.ownedProducts];
+            newOwnedProducts.push(action.payload.purchase);
             return {
                 ...newState,
                 ownedProducts: newOwnedProducts
