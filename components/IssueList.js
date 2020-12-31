@@ -65,6 +65,7 @@ const IssueList = ({
     }
 
     const firstUnlockedPublishTimestamp = getFirstUnlockedPublishTimestamp(activeSubscription, issueList);
+    // console.log(ownedProducts, firstUnlockedPublishTimestamp);
 
     const getProduct = (issue) => {
         if (!!availableProducts && availableProducts.length > 0) {
@@ -124,7 +125,7 @@ const IssueList = ({
                             product={getProduct(issue.item)}
                             purchase={getPurchase(issue.item)}
                             />}
-                    keyExtractor={issue => issue.sku}
+                    keyExtractor={issue => issue.product_id}
                     showsVerticalScrollIndicator={false}
                 />
             }
