@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
 import { 
     getHeroFilename, 
     presignedUrlIsAlive
@@ -17,8 +17,6 @@ import {
     HERO_IMAGE_RATIO 
 } from '../constants';
 import { styleConstants } from '../constants/styles';
-import ErrorHelperText from './ErrorHelperText';
-
 
 const IssueHero = ({fileCacheMap, fileLinkMap, getResource, getResourceFromLink, uploadTimestamp, visible}) => {
 
@@ -54,16 +52,10 @@ const IssueHero = ({fileCacheMap, fileLinkMap, getResource, getResourceFromLink,
             />
         }
         { fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.REQUESTED &&
-            <ActivityIndicator size={"large"} color={styleConstants.activityIndicator.color} />
+            <ActivityIndicator size={"large"} color={styleConstants.activityIndicatorLight.color} />
         }
         { fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.IN_PROGRESS &&
-            <ActivityIndicator size={"large"} color={styleConstants.activityIndicator.color} />
-        }
-        { fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.FAILED &&
-            <Text style={styles.errorText}>
-                There was a problem fetching this image. Try again in a few minutes. 
-                <ErrorHelperText />
-            </Text>
+            <ActivityIndicator size={"large"} color={styleConstants.activityIndicatorLight.color} />
         }
     </View>;
 };
@@ -77,9 +69,6 @@ const styles = StyleSheet.create({
         minHeight: HERO_IMAGE_SCALE * HERO_IMAGE_RATIO,
         backgroundColor: "#000",
         borderRadius: 6
-    },
-    errorText: {
-        padding: 4
     },
     heroImage: {
         width: HERO_IMAGE_SCALE,

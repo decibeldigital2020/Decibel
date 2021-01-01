@@ -5,6 +5,9 @@ export const styleConstants = {
     activityIndicator: {
         color: "#000"
     },
+    activityIndicatorLight: {
+        color: "#FFF"
+    },
     button: {
         color: "#FFF"
     },
