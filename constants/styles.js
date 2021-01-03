@@ -26,6 +26,9 @@ export const styleConstants = {
     iconMedium: {
         color: "#555"
     },
+    link: {
+        color: "#FFF"
+    },
     passiveButton: {
         color: "#555"
     },

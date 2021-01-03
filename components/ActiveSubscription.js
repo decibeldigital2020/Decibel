@@ -23,6 +23,7 @@ import {
     getPrice,
     getRecentSubscriptionDate
 } from '../util/subscriptionsUtil';
+import AgreementsLinks from './AgreementsLinks';
 
 const HOW_TO_MANAGE_SUBSCRIPTION_TEXT = "To manage your subscription, open the Settings app. Tap your name, tap Subscriptions, then tap the subscription that you want to manage.";
 const MANAGE_SUBSCRIPTION_LINK = "itms-apps://apps.apple.com/account/subscriptions";
@@ -79,6 +80,7 @@ const ActiveSubscription = ({activeSubscription, availableSubscriptions, getAvai
                 }}
                 title="Manage Subscription" />
         </View>
+        <AgreementsLinks />
     </View>;
 };
 

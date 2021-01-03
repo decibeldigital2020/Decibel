@@ -28,14 +28,18 @@ const persistedReducer = persistReducer(persistedReducerConfig, reducer);
 let store = createStore(persistedReducer, applyMiddleware(thunk));
 const persistor = persistStore(store);
 
-const App = () => {
+const App = ({build, version}) => {
+
+  const getFullVersion = () => (version + '.' + build);
+
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <SafeAreaView style={styles.container}>
           <StatusBar barStyle="light-content" backgroundColor={styleConstants.statusBar.backgroundColor} />
           { !__DEV__ && <InAppPurchaseHandler /> }
-          <Navigation />
+          <Navigation
+            version={getFullVersion()} />
           <ProcessingTransaction />
         </SafeAreaView>
       </PersistGate>

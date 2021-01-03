@@ -8,6 +8,7 @@ const initialState = {
     availableSubscriptions: [
         // IAP.Product
     ],
+    currentVersion: null,
     fileCacheMap: {
         /*
          * filename: {
@@ -61,6 +62,14 @@ const reducer = (state = initialState, action) => {
             return {
                 ...newState,
                 availableSubscriptions: action.payload
+            }
+        }
+        case "CLEAR_CACHE": {
+            return {
+                ...newState,
+                fileCacheMap: {
+                    ...initialState.fileCacheMap
+                }
             }
         }
         case "COMPLETE_FILE_CACHE": {
@@ -184,6 +193,12 @@ const reducer = (state = initialState, action) => {
                 newState.selectedIssue = null;
             }
             return newState;
+        }
+        case "VERSION": {
+            return {
+                ...newState,
+                currentVersion: action.payload
+            }
         }
     	default:
             return state;

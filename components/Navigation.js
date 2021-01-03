@@ -9,6 +9,7 @@ import Icon from 'react-native-ionicons';
 import Help from './Help';
 import LogoTitle from './LogoTitle';
 import Subscriptions from './Subscriptions';
+import { connect } from 'react-redux';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -166,7 +167,15 @@ const RootTabNavigator = (props) =>
       }} />
   </Tab.Navigator>;
 
-const Navigation = () => {
+const Navigation = ({currentVersion, clearCache, setVersion, version}) => {
+
+  React.useEffect(() => {
+    if (currentVersion !== version) {
+      clearCache();
+      setVersion(version);
+    }
+  }, [version]);
+
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -196,4 +205,13 @@ const Navigation = () => {
   );
 };
 
-export default Navigation;
+const mapStateToProps = state => ({
+  currentVersion: state.currentVersion
+});
+
+const mapDispatchToProps = dispatch => ({
+  clearCache: () => dispatch({ type: "CLEAR_CACHE" }),
+  setVersion: (version) => dispatch({ type: "VERSION", payload: version })
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Navigation);

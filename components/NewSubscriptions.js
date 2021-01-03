@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { styleConstants } from '../constants/styles';
+import AgreementsLinks from './AgreementsLinks';
 import { 
     getAvailableSubscriptions as getAvailableSubscriptionsAction,
     requestNewSubscription as requestNewSubscriptionAction
@@ -73,6 +74,7 @@ const NewSubscriptions = ({availableSubscriptions, getAvailableSubscriptions, re
                 { FINE_PRINT }
             </Text>
         </View>
+        <AgreementsLinks />
     </View>;
 };
 
@@ -97,6 +99,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         marginBottom: 16,
         marginTop: 12,
+        maxHeight: 200
     },
     finePrintText: {
         color: "#FFF",
