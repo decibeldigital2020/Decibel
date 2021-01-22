@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
-    <device id="retina5_9" orientation="portrait" appearance="light"/>
+    <device id="ipad12_9" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
@@ -13,23 +13,22 @@
             <objects>
                 <viewController id="01J-lp-oVM" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <rect key="frame" x="0.0" y="0.0" width="1024" height="1366"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="decibel-header-logo" translatesAutoresizingMaskIntoConstraints="NO" id="w8d-Jd-A1k">
-                                <rect key="frame" x="38.666666666666657" y="385.66666666666669" width="298" height="41"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="dBApp_SplashScreen (1)" translatesAutoresizingMaskIntoConstraints="NO" id="w8d-Jd-A1k">
+                                <rect key="frame" x="20" y="-382.5" width="984" height="2131"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" secondItem="w8d-Jd-A1k" secondAttribute="height" multiplier="298:41" id="EnM-o1-N5d"/>
-                                    <constraint firstAttribute="width" constant="298" id="TGO-Iu-Xvs"/>
-                                    <constraint firstAttribute="height" constant="41" id="pKC-4h-QT5"/>
+                                    <constraint firstAttribute="width" secondItem="w8d-Jd-A1k" secondAttribute="height" multiplier="375:812" id="fzw-U8-Vng"/>
                                 </constraints>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="w8d-Jd-A1k" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="Ckd-dH-zvu"/>
-                            <constraint firstItem="w8d-Jd-A1k" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="VgR-R8-vaG"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="w8d-Jd-A1k" secondAttribute="trailing" id="BmI-j8-ioH"/>
+                            <constraint firstItem="w8d-Jd-A1k" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="u7L-7e-aE0"/>
+                            <constraint firstItem="w8d-Jd-A1k" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leadingMargin" id="y4y-cb-gqA"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -39,6 +38,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="decibel-header-logo" width="766" height="127"/>
+        <image name="dBApp_SplashScreen (1)" width="1125" height="2436"/>
     </resources>
 </document>
