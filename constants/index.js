@@ -12,7 +12,8 @@ export const FILE_RETRIEVAL_STATUS = {
 };
 export const RESOURCE_TYPE = {
     HERO: "hero",
-    ISSUE: "issue",
+    ISSUE: "issue",             // Deprecated issue PDF
+    ISSUE_IMG: "issue_img",     // New issue JPGs by page
     PREVIEW_IMG: "preview_img",
     PREVIEW_PDF: "preview_pdf"
 };
@@ -24,3 +25,4 @@ export const HERO_IMAGE_RATIO = 1.34;
 export const ISSUE_LIST_DESCRIPTION_LENGTH = 120;
 export const ACCORDION_DURATION = 300;
 export const MAX_PREVIEW_CACHE_SIZE = 5;
+export const NUMBER_OF_PREVIEW_PAGES = 15;

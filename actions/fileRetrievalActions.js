@@ -136,7 +136,7 @@ export const getResource = (uploadTimestamp, resourceType, page, receipt) => dis
         //console.log("Received response", response);
         if (response.status !== 200) {
             console.error("Status not 200", response.status);
-            if (response.status === 401 && resourceType === RESOURCE_TYPE.ISSUE) {
+            if (response.status === 401 && (resourceType === RESOURCE_TYPE.ISSUE || resourceType === RESOURCE_TYPE.ISSUE_IMG)) {
                 Alert.alert("Error", INVALIDATED_SUBSCRIPTION_ERROR_MSG);
                 dispatch(invalidateActiveSubscription());
             }

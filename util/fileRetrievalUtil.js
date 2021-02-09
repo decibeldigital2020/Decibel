@@ -6,6 +6,7 @@ export const getPreviewPdfFilename = uploadTimestamp => `${uploadTimestamp}_prev
 export const getPreviewImageFilename = (uploadTimestamp, page) => `${uploadTimestamp}_preview-${page}.jpg`;
 export const getHeroFilename = uploadTimestamp => `${uploadTimestamp}_hero-0.jpg`;
 export const getIssueFilename = uploadTimestamp => `${uploadTimestamp}.pdf`;
+export const getIssueImageFilename = (uploadTimestamp, page) => `${uploadTimestamp}_issue-${page}.jpg`;
 
 export const getFilenameByResourceType = (uploadTimestamp, resourceType, page) => {
     switch (resourceType) {
@@ -14,6 +15,9 @@ export const getFilenameByResourceType = (uploadTimestamp, resourceType, page) =
         }
         case RESOURCE_TYPE.ISSUE: {
             return getIssueFilename(uploadTimestamp);
+        }
+        case RESOURCE_TYPE.ISSUE_IMG: {
+            return getIssueImageFilename(uploadTimestamp, page);
         }
         case RESOURCE_TYPE.PREVIEW_IMG: {
             return getPreviewImageFilename(uploadTimestamp, page);
