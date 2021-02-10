@@ -20,7 +20,10 @@ import {
     RESOURCE_TYPE 
 } from "../constants";
 import { styleConstants } from '../constants/styles';
-import { getResource as getResourceAction, removeResource as removeResourceAction } from '../actions/fileRetrievalActions';
+import { 
+    getIssue as getIssueAction,
+    removeIssue as removeIssueAction 
+} from '../actions/issueRetrievalActions';
 import { requestNewPurchase as requestNewPurchaseAction } from '../actions/iapActions';
 import { getIssueFilename } from '../util/fileRetrievalUtil';
 
@@ -28,14 +31,14 @@ const IssueListItem = ({
     controlAccordion, 
     downloaded, 
     fileCacheMap, 
-    getResource, 
+    getIssue,
     issue, 
     owned, 
     navigation, 
     product,
     purchase,
     requestNewPurchase,
-    removeResource, 
+    removeIssue, 
     selectIssue 
 }) => {
 
@@ -120,7 +123,7 @@ const IssueListItem = ({
                                 color={styleConstants.button.color}
                                 title={"Download Issue"}
                                 onPress={() => {
-                                    getResource(issue.upload_timestamp, RESOURCE_TYPE.ISSUE, null, getReceipt());
+                                    getIssue(issue.upload_timestamp, issue.total_pages, getReceipt());
                                 }}
                             />
                         </View>
@@ -141,7 +144,7 @@ const IssueListItem = ({
                                 color={styleConstants.button.color}
                                 title={"Downloading (" + Math.floor(fileCacheMap[filename].progress*100) + "%)"}
                                 onPress={() => {
-                                    selectIssue(issue.product_id);
+                                    selectIssue(issue.product_id, getReceipt());
                                     navigation.navigate('ViewIssue');
                                 }}
                             />
@@ -153,7 +156,7 @@ const IssueListItem = ({
                                 color={styleConstants.button.color}
                                 title={"View Issue"}
                                 onPress={() => {
-                                    selectIssue(issue.product_id);
+                                    selectIssue(issue.product_id, getReceipt());
                                     navigation.navigate('ViewIssue');
                                 }}
                             />
@@ -202,7 +205,7 @@ const IssueListItem = ({
                                         color={styleConstants.button.color}
                                         title={"Yes, Delete Issue"}
                                         onPress={() => {
-                                            removeResource(filename);
+                                            removeIssue(issue.upload_timestamp, issue.total_pages);
                                         }} 
                                     />
                                 </View>
@@ -357,10 +360,10 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = () => dispatch => ({
-    getResource: (resourceName, resourceType, page, receipt) => dispatch(getResourceAction(resourceName, resourceType, page, receipt)),
-    removeResource: (filename) => dispatch(removeResourceAction(filename)),
+    getIssue: (resourceName, totalPages, receipt) => dispatch(getIssueAction(resourceName, totalPages, receipt)),
+    removeIssue: (resourceName, totalPages) => dispatch(removeIssueAction(resourceName, totalPages)),
     requestNewPurchase: (sku) => dispatch(requestNewPurchaseAction(sku)),
-    selectIssue: productId => dispatch({ type: "SELECT_ISSUE", payload: { productId }})
+    selectIssue: (productId, receipt) => dispatch({ type: "SELECT_ISSUE", payload: { productId, receipt }})
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(IssueListItem);

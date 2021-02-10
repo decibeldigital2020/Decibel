@@ -19,6 +19,7 @@ import { styleConstants } from './constants/styles';
 import InAppPurchaseHandler from './components/InAppPurchaseHandler';
 import ProcessingTransaction from './components/ProcessingTransaction';
 import Navigation from './components/Navigation';
+import DownloadQueueProcessor from './components/DownloadQueueProcessor';
 
 const persistedReducerConfig = {
   key: 'root',
@@ -41,6 +42,7 @@ const App = ({build, version}) => {
           <Navigation
             version={getFullVersion()} />
           <ProcessingTransaction />
+          <DownloadQueueProcessor />
         </SafeAreaView>
       </PersistGate>
     </Provider>

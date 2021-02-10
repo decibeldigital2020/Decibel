@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import IssueList from './IssueList';
+import PreviewIssue from './PreviewIssue';
 import ViewIssue from './ViewIssue';
 import { styleConstants } from '../constants/styles';
 import Icon from 'react-native-ionicons';
@@ -13,7 +14,6 @@ import { connect } from 'react-redux';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-const PreviewIssue = props => <ViewIssue previewOnly={true} {...props} />;
 const Downloads = props => <IssueList downloadsOnly={true} {...props} />;
 const OwnedIssues = props => <IssueList ownedOnly={true} {...props} />;
 

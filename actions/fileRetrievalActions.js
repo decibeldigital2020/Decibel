@@ -52,7 +52,7 @@ const fetchResource = (dispatch, filename, url) => {
 }
 
 export const cancelGetResource = (filename, task) => dispatch => {
-    task.cancel(err => {
+    task && task.cancel(err => {
         if (err) {
             console.error("Error canceling task", filename, task, JSON.stringify(err));
             dispatch({

@@ -3,25 +3,28 @@ import { ProgressView } from "@react-native-community/progress-view";
 import { connect } from 'react-redux';
 import { ActivityIndicator, Button, StyleSheet, Text, View } from 'react-native';
 import {
-    cancelIssueDownload as cancelIssueDownloadAction
+    cancelIssuePreviewDownload as cancelIssuePreviewDownloadAction,
+    getIssuePreview as getIssuePreviewAction,
+    removeIssuePreview as removeIssuePreviewAction
 } from '../actions/issueRetrievalActions';
 import {
-    getIssueDownloadProgress,
-    getIssueDownloadStatus,
-    getIssueFilenames
-} from '../actions/issueRetrievalActions';
+    getIssuePreviewDownloadProgress,
+    getIssuePreviewDownloadStatus,
+    getIssuePreviewFilenames
+} from '../util/issueRetrievalUtil';
 import { FILE_RETRIEVAL_STATUS, RESOURCE_TYPE } from '../constants';
 import { styleConstants } from '../constants/styles';
 import ErrorHelperText from './ErrorHelperText';
 import LogoTitle from './LogoTitle';
 import ImageListViewer from './ImageListViewer';
 
-const ViewIssue = ({
-    cancelIssueDownload,
+const PreviewIssue = ({
+    cancelIssuePreviewDownload,
     fileCacheMap, 
+    getIssuePreview,
     navigation, 
-    selectedIssue,
-    selectedReceipt
+    removeIssuePreview,
+    selectedIssue
 }) => {
 
     const goBack = () => navigation && navigation.goBack && navigation.goBack();
@@ -32,18 +35,20 @@ const ViewIssue = ({
 
     let resourceName = selectedIssue.upload_timestamp;
     let resourceType = RESOURCE_TYPE.ISSUE_IMG;
-    let totalPages = selectedIssue.total_pages;
-    let issueDownloadStatus = getIssueDownloadStatus(resourceName, resourceType, totalPages, fileCacheMap);
+    let issueDownloadStatus = getIssuePreviewDownloadStatus(resourceName, fileCacheMap);
 
-    if (issueDownloadStatus === FILE_RETRIEVAL_STATUS.NOT_STARTED) {
-        goBack();
-    }
+    React.useEffect(() => {
+        if (issueDownloadStatus === FILE_RETRIEVAL_STATUS.NOT_STARTED) {
+            // TODO evict older previews
+            getIssuePreview(resourceName);
+        }
+    }, [selectedIssue]);
 
     return <View style={styles.container}>
         { issueDownloadStatus === FILE_RETRIEVAL_STATUS.COMPLETED &&
             <React.Fragment>
                 <ImageListViewer
-                    filenames={getIssueFilenames(resourceName, fileCacheMap)} />
+                    filenames={getIssuePreviewFilenames(resourceName, fileCacheMap)} />
                 <Button
                     color={styleConstants.passiveButton.color}
                     onPress={goBack}
@@ -67,17 +72,17 @@ const ViewIssue = ({
                 </View>
                 <Text style={styles.issueTitle}>{ selectedIssue.display_date + " - " + selectedIssue.issue_name }</Text>
                 <View style={styles.progressInfo}>
-                    <Text style={styles.inProgressText}>Downloading ({Math.floor(getIssueDownloadProgress(resourceName, resourceType, totalPages, fileCacheMap)*100)}%)...</Text>
+                    <Text style={styles.inProgressText}>Downloading ({Math.floor(getIssuePreviewDownloadProgress(resourceName, fileCacheMap)*100)}%)...</Text>
                     <ProgressView
                         progressTintColor={styles.progressTintColor.color}
                         trackTintColor={styles.trackTintColor.color}
-                        progress={getIssueDownloadProgress(resourceName, resourceType, totalPages, fileCacheMap)}
+                        progress={getIssuePreviewDownloadProgress(resourceName, fileCacheMap)}
                     />
                 </View>
                 <Button
                     color={styleConstants.actionButton.color}
                     onPress={() => {
-                        cancelIssueDownload(resourceName, totalPages, selectedReceipt, fileCacheMap);
+                        cancelIssuePreviewDownload(resourceName, fileCacheMap);
                         goBack();
                     }}
                     style={styles.cancelDownloadButton}
@@ -169,12 +174,13 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
     fileCacheMap: state.fileCacheMap,
-    selectedIssue: state.selectedIssue,
-    selectedReceipt: state.selectedReceipt
+    selectedIssue: state.selectedIssue
 });
 
 const mapDispatchToProps = dispatch => ({
-    cancelIssueDownload: (resourceName, totalPages, receipt, fileCacheMap) => dispatch(cancelIssueDownloadAction(resourceName, totalPages, receipt, fileCacheMap))
+    cancelIssuePreviewDownload: (resourceName, fileCacheMap) => dispatch(cancelIssuePreviewDownloadAction(resourceName, fileCacheMap)),
+    getIssuePreview: (resourceName) => dispatch(getIssuePreviewAction(resourceName)),
+    removeIssuePreview: (resourceName) => dispatch(removeIssuePreviewAction(resourceName))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ViewIssue);
+export default connect(mapStateToProps, mapDispatchToProps)(PreviewIssue);

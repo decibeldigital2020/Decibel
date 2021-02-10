@@ -1,5 +1,4 @@
 import { ENDPOINT_ISSUE_LIST_LAMBDA, HEROS_TO_PREFETCH, RESOURCE_TYPE } from "../constants";
-import { getResource, getResourceLink } from './fileRetrievalActions';
 import { getAvailableProducts } from './iapActions';
 
 export const getIssueList = () => (dispatch) => {
@@ -39,7 +38,13 @@ export const getIssueList = () => (dispatch) => {
         });
         // Pre-fetch first 10 issue heros
         responseJson.issues.slice(0, HEROS_TO_PREFETCH).forEach(issue => 
-            dispatch(getResource(issue.upload_timestamp, RESOURCE_TYPE.HERO))
+            dispatch({
+                type: "DOWNLOAD_QUEUE_PUSH",
+                payload: {
+                    resourceName: issue.upload_timestamp,
+                    resourceType: RESOURCE_TYPE.HERO
+                }
+            });
         );
 
         // Fetch apple store product info

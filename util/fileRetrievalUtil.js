@@ -4,9 +4,11 @@ const getResourceErrorMessage = "There was a problem downloading the requested i
 
 export const getPreviewPdfFilename = resourceName => `${resourceName}_preview.pdf`;
 export const getPreviewImageFilename = (resourceName, page) => `${resourceName}_preview-${page}.jpg`;
+export const getPreviewImagePrefix = (resourceName) => `${resourceName}_preview-`;
 export const getHeroFilename = resourceName => `${resourceName}_hero-0.jpg`;
 export const getIssueFilename = resourceName => `${resourceName}.pdf`;
 export const getIssueImageFilename = (resourceName, page) => `${resourceName}_issue-${page}.jpg`;
+export const getIssueImagePrefix = (resourceName) => `${resourceName}_issue-`;
 
 export const getFilenameByResourceType = (resourceName, resourceType, page) => {
     switch (resourceType) {
