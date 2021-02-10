@@ -2,28 +2,28 @@ import { RESOURCE_TYPE, MAX_PRESIGNED_URL_AGE } from '../constants';
 
 const getResourceErrorMessage = "There was a problem downloading the requested item. Please try again in a few minutes.";
 
-export const getPreviewPdfFilename = uploadTimestamp => `${uploadTimestamp}_preview.pdf`;
-export const getPreviewImageFilename = (uploadTimestamp, page) => `${uploadTimestamp}_preview-${page}.jpg`;
-export const getHeroFilename = uploadTimestamp => `${uploadTimestamp}_hero-0.jpg`;
-export const getIssueFilename = uploadTimestamp => `${uploadTimestamp}.pdf`;
-export const getIssueImageFilename = (uploadTimestamp, page) => `${uploadTimestamp}_issue-${page}.jpg`;
+export const getPreviewPdfFilename = resourceName => `${resourceName}_preview.pdf`;
+export const getPreviewImageFilename = (resourceName, page) => `${resourceName}_preview-${page}.jpg`;
+export const getHeroFilename = resourceName => `${resourceName}_hero-0.jpg`;
+export const getIssueFilename = resourceName => `${resourceName}.pdf`;
+export const getIssueImageFilename = (resourceName, page) => `${resourceName}_issue-${page}.jpg`;
 
-export const getFilenameByResourceType = (uploadTimestamp, resourceType, page) => {
+export const getFilenameByResourceType = (resourceName, resourceType, page) => {
     switch (resourceType) {
         case RESOURCE_TYPE.HERO: {
-            return getHeroFilename(uploadTimestamp);
+            return getHeroFilename(resourceName);
         }
         case RESOURCE_TYPE.ISSUE: {
-            return getIssueFilename(uploadTimestamp);
+            return getIssueFilename(resourceName);
         }
         case RESOURCE_TYPE.ISSUE_IMG: {
-            return getIssueImageFilename(uploadTimestamp, page);
+            return getIssueImageFilename(resourceName, page);
         }
         case RESOURCE_TYPE.PREVIEW_IMG: {
-            return getPreviewImageFilename(uploadTimestamp, page);
+            return getPreviewImageFilename(resourceName, page);
         }
         case RESOURCE_TYPE.PREVIEW_PDF: {
-            return getPreviewPdfFilename(uploadTimestamp);
+            return getPreviewPdfFilename(resourceName);
         }
     }
 };

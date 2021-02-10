@@ -18,9 +18,9 @@ import {
 } from '../constants';
 import { styleConstants } from '../constants/styles';
 
-const IssueHero = ({fileCacheMap, fileLinkMap, getResource, getResourceFromLink, uploadTimestamp, visible}) => {
+const IssueHero = ({fileCacheMap, fileLinkMap, getResource, getResourceFromLink, resourceName, visible}) => {
 
-    const filename = getHeroFilename(uploadTimestamp);
+    const filename = getHeroFilename(resourceName);
 
     React.useEffect(() => {
         if (!visible) {
@@ -35,10 +35,10 @@ const IssueHero = ({fileCacheMap, fileLinkMap, getResource, getResourceFromLink,
                 // Do nothing, wait for url fetch to complete
                 return;
             } else {
-                getResource(uploadTimestamp, RESOURCE_TYPE.HERO);
+                getResource(resourceName, RESOURCE_TYPE.HERO);
             }
         }
-    }, [fileCacheMap, fileLinkMap, uploadTimestamp, visible]);
+    }, [fileCacheMap, fileLinkMap, resourceName, visible]);
 
     if (!fileCacheMap[filename]) {
         return null;
@@ -83,7 +83,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    getResource: (uploadTimestamp, resourceType) => dispatch(getResourceAction(uploadTimestamp, resourceType)),
+    getResource: (resourceName, resourceType) => dispatch(getResourceAction(resourceName, resourceType)),
     getResourceFromLink: (url) => dispatch(getResourceFromLinkAction(url))
 });
 

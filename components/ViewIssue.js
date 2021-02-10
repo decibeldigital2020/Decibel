@@ -185,7 +185,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
     cancelGetResource: (filename, task) => dispatch(cancelGetResourceAction(filename, task)),
-    getResource: (uploadTimestamp, resourceType, page) => dispatch(getResourceAction(uploadTimestamp, resourceType, page)),
+    getResource: (resourceName, resourceType, page) => dispatch(getResourceAction(resourceName, resourceType, page)),
     removeResource: (filename) => dispatch(removeResourceAction(filename))
 });
 

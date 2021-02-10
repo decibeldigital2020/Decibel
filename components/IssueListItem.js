@@ -98,7 +98,7 @@ const IssueListItem = ({
                 style={styles.accordion}
                 onLayout={event => setBodySectionHeight(event.nativeEvent.layout.height) }>
                 <IssueHero 
-                    uploadTimestamp={issue.upload_timestamp} 
+                    resourceName={issue.upload_timestamp} 
                     style={styles.issueHero}
                     visible={accordionOpen} 
                 />
@@ -357,7 +357,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = () => dispatch => ({
-    getResource: (uploadTimestamp, resourceType, page, receipt) => dispatch(getResourceAction(uploadTimestamp, resourceType, page, receipt)),
+    getResource: (resourceName, resourceType, page, receipt) => dispatch(getResourceAction(resourceName, resourceType, page, receipt)),
     removeResource: (filename) => dispatch(removeResourceAction(filename)),
     requestNewPurchase: (sku) => dispatch(requestNewPurchaseAction(sku)),
     selectIssue: productId => dispatch({ type: "SELECT_ISSUE", payload: { productId }})

@@ -68,11 +68,11 @@ export const cancelGetResource = (filename, task) => dispatch => {
     });
 }
 
-export const getResourceLink = (uploadTimestamp, resourceType, page) => dispatch => {
-    let filename = getFilenameByResourceType(uploadTimestamp, resourceType);
+export const getResourceLink = (resourceName, resourceType, page) => dispatch => {
+    let filename = getFilenameByResourceType(resourceName, resourceType);
     let data = {
         resource_type: resourceType,
-        resource_name: uploadTimestamp
+        resource_name: resourceName
     };
     if (page) {
         data.page = page;
@@ -114,11 +114,11 @@ export const getResourceFromLink = (url) => dispatch => {
     fetchResource(dispatch, filename, url);
 }
 
-export const getResource = (uploadTimestamp, resourceType, page, receipt) => dispatch => {
-    let filename = getFilenameByResourceType(uploadTimestamp, resourceType);
+export const getResource = (resourceName, resourceType, page, receipt) => dispatch => {
+    let filename = getFilenameByResourceType(resourceName, resourceType);
     let data = {
         resource_type: resourceType,
-        resource_name: uploadTimestamp
+        resource_name: resourceName
     };
     if (page) {
         data.page = page;

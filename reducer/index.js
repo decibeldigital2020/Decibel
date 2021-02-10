@@ -11,7 +11,7 @@ const initialState = {
     currentVersion: null,
     downloadedIssues: {
         /*
-         * uploadTimestamp: {
+         * resourceName: {
          *   [pageNumber]: {
          *     filename: String,
          *     status: oneOf: [requested, in_progress, completed, failed]
@@ -21,7 +21,7 @@ const initialState = {
     },
     downloadedPreviews: {
         /*
-         * uploadTimestamp: {
+         * resourceName: {
          *   [pageNumber]: {
          *     filename: String,
          *     status: oneOf: [requested, in_progress, completed, failed]
@@ -108,68 +108,6 @@ const reducer = (state = initialState, action) => {
                 url: action.payload.url
             });
             newState.fileLinkMap[action.payload.filename] = newLinkEntry;
-            return newState;
-        }
-        case "COMPLETE_ISSUE_PAGE": {
-            // action.payload = { uploadTimestamp, page }
-            newState.downloadedIssues = Object.assign({}, newState.downloadedIssues);
-            newState.downloadedIssues[action.payload.uploadTimestamp][action.payload.page] = {
-                ...newState.downloadedIssues[action.payload.uploadTimestamp][action.payload.page],
-                status: FILE_RETRIEVAL_STATUS.COMPLETED
-            }
-        }
-        case "IN_PROGRESS_ISSUE_PAGE": {
-            // action.payload = { uploadTimestamp, page, progress }
-            newState.downloadedIssues = Object.assign({}, newState.downloadedIssues);
-            newState.downloadedIssues[action.payload.uploadTimestamp][action.payload.page] = {
-                ...newState.downloadedIssues[action.payload.uploadTimestamp][action.payload.page],
-                progress: action.payload.progress,
-                status: FILE_RETRIEVAL_STATUS.IN_PROGRESS
-            }
-        }
-        case "REQUEST_ISSUE_PAGE": {
-            // action.payload = { uploadTimestamp, page, filename }
-            newState.downloadedIssues = Object.assign({}, newState.downloadedIssues);
-            newState.downloadedIssues[action.payload.uploadTimestamp][action.payload.page] = {
-                filename: action.payload.filename,
-                status: FILE_RETRIEVAL_STATUS.REQUESTED
-            }
-        }
-        case "DOWNLOAD_ISSUE_FAILED": {
-            // action.payload = uploadTimestamp
-            newState.downloadedIssues = Object.assign({}, newState.downloadedIssues);
-            delete newState.downloadedIssues[action.payload];
-            return newState;
-        }
-        case "COMPLETE_PREVIEW_PAGE": {
-            // action.payload = { uploadTimestamp, page }
-            newState.downloadedPreviews = Object.assign({}, newState.downloadedPreviews);
-            newState.downloadedPreviews[action.payload.uploadTimestamp][action.payload.page] = {
-                ...newState.downloadedPreviews[action.payload.uploadTimestamp][action.payload.page],
-                status: FILE_RETRIEVAL_STATUS.COMPLETED
-            }
-        }
-        case "IN_PROGRESS_PREVIEW_PAGE": {
-            // action.payload = { uploadTimestamp, page, progress }
-            newState.downloadedPreviews = Object.assign({}, newState.downloadedPreviews);
-            newState.downloadedPreviews[action.payload.uploadTimestamp][action.payload.page] = {
-                ...newState.downloadedPreviews[action.payload.uploadTimestamp][action.payload.page],
-                progress: action.payload.progress,
-                status: FILE_RETRIEVAL_STATUS.IN_PROGRESS
-            }
-        }
-        case "REQUEST_PREVIEW_PAGE": {
-            // action.payload = { uploadTimestamp, page, filename }
-            newState.downloadedPreviews = Object.assign({}, newState.downloadedPreviews);
-            newState.downloadedPreviews[action.payload.uploadTimestamp][action.payload.page] = {
-                filename: action.payload.filename,
-                status: FILE_RETRIEVAL_STATUS.REQUESTED
-            }
-        }
-        case "DOWNLOAD_PREVIEW_FAILED": {
-            // action.payload = uploadTimestamp
-            newState.downloadedPreviews = Object.assign({}, newState.downloadedPreviews);
-            delete newState.downloadedPreviews[action.payload];
             return newState;
         }
         case "FAIL_FILE_CACHE": {
@@ -282,6 +220,73 @@ const reducer = (state = initialState, action) => {
                 currentVersion: action.payload
             }
         }
+
+        // downloadedIssues actions
+        case "COMPLETE_ISSUE_PAGE": {
+            // action.payload = { resourceName, page }
+            newState.downloadedIssues = Object.assign({}, newState.downloadedIssues);
+            newState.downloadedIssues[action.payload.resourceName][action.payload.page] = {
+                ...newState.downloadedIssues[action.payload.resourceName][action.payload.page],
+                status: FILE_RETRIEVAL_STATUS.COMPLETED
+            }
+        }
+        case "IN_PROGRESS_ISSUE_PAGE": {
+            // action.payload = { resourceName, page, progress }
+            newState.downloadedIssues = Object.assign({}, newState.downloadedIssues);
+            newState.downloadedIssues[action.payload.resourceName][action.payload.page] = {
+                ...newState.downloadedIssues[action.payload.resourceName][action.payload.page],
+                progress: action.payload.progress,
+                status: FILE_RETRIEVAL_STATUS.IN_PROGRESS
+            }
+        }
+        case "REQUEST_ISSUE_PAGE": {
+            // action.payload = { resourceName, page, filename }
+            newState.downloadedIssues = Object.assign({}, newState.downloadedIssues);
+            newState.downloadedIssues[action.payload.resourceName][action.payload.page] = {
+                filename: action.payload.filename,
+                status: FILE_RETRIEVAL_STATUS.REQUESTED
+            }
+        }
+        case "DOWNLOAD_ISSUE_FAILED": {
+            // action.payload = resourceName
+            newState.downloadedIssues = Object.assign({}, newState.downloadedIssues);
+            delete newState.downloadedIssues[action.payload];
+            return newState;
+        }
+
+        // downloadedPreviews actions
+        case "COMPLETE_PREVIEW_PAGE": {
+            // action.payload = { resourceName, page }
+            newState.downloadedPreviews = Object.assign({}, newState.downloadedPreviews);
+            newState.downloadedPreviews[action.payload.resourceName][action.payload.page] = {
+                ...newState.downloadedPreviews[action.payload.resourceName][action.payload.page],
+                status: FILE_RETRIEVAL_STATUS.COMPLETED
+            }
+        }
+        case "IN_PROGRESS_PREVIEW_PAGE": {
+            // action.payload = { resourceName, page, progress }
+            newState.downloadedPreviews = Object.assign({}, newState.downloadedPreviews);
+            newState.downloadedPreviews[action.payload.resourceName][action.payload.page] = {
+                ...newState.downloadedPreviews[action.payload.resourceName][action.payload.page],
+                progress: action.payload.progress,
+                status: FILE_RETRIEVAL_STATUS.IN_PROGRESS
+            }
+        }
+        case "REQUEST_PREVIEW_PAGE": {
+            // action.payload = { resourceName, page, filename }
+            newState.downloadedPreviews = Object.assign({}, newState.downloadedPreviews);
+            newState.downloadedPreviews[action.payload.resourceName][action.payload.page] = {
+                filename: action.payload.filename,
+                status: FILE_RETRIEVAL_STATUS.REQUESTED
+            }
+        }
+        case "DOWNLOAD_PREVIEW_FAILED": {
+            // action.payload = resourceName
+            newState.downloadedPreviews = Object.assign({}, newState.downloadedPreviews);
+            delete newState.downloadedPreviews[action.payload];
+            return newState;
+        }
+
     	default:
             return state;
     }
