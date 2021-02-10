@@ -36,6 +36,7 @@ const initialState = {
     },
     issueList: null, // See mocks.issueListResponse
     issueListRequestedTimestamp: 0,
+    orientation: null,
     ownedProducts: [
         /*
          * IAP.Purchase
@@ -150,6 +151,12 @@ const reducer = (state = initialState, action) => {
                 ...newState,
                 issueList: action.payload,
                 issueListRequestedTimestamp: Date.now()
+            }
+        }
+        case "ORIENTATION": {
+            return {
+                ...newState,
+                orientation: action.payload.orientation
             }
         }
         //In app purchases

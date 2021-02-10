@@ -27,11 +27,12 @@ const failFileCache = (err, dispatch, filename) => {
 const getFilePath = (filename) => (RNFetchBlob.fs.dirs.DocumentDir + "/" + filename);
 
 const fetchResource = (dispatch, filename, url) => {
+    console.log(`fetching ${filename} from ${url}`)
     let dirs = RNFetchBlob.fs.dirs;
     let task = RNFetchBlob.config({ path : getFilePath(filename) }).fetch('GET', url);
     dispatch({ type: "REQUEST_FILE_CACHE", payload: { filename, task } });
     return task.progress({ count : PROGRESS_FACTOR }, (received, total) => {
-        //console.log('progress', received / total);
+        console.log('progress', received / total);
         dispatch({
             type: "IN_PROGRESS_FILE_CACHE",
             payload: {
@@ -40,7 +41,7 @@ const fetchResource = (dispatch, filename, url) => {
             }
         });
     }).then((resourceResponse) => {
-        //console.log('Got resource response', resourceResponse);
+        console.log('Got resource response', resourceResponse);
         dispatch({
             type: "COMPLETE_FILE_CACHE",
             payload: {
@@ -68,30 +69,31 @@ export const cancelGetResource = (filename, task) => dispatch => {
     });
 }
 
+/* deprecated */
 export const getResourceLink = (resourceName, resourceType, page) => dispatch => {
     let filename = getFilenameByResourceType(resourceName, resourceType);
     let data = {
         resource_type: resourceType,
         resource_name: resourceName
     };
-    if (page) {
+    if (typeof page === "number") {
         data.page = page;
     }
-    //console.log("Fetching link " + ENDPOINT_RESOURCE_LAMBDA, data, filename);
+    console.log("Fetching link " + ENDPOINT_RESOURCE_LAMBDA, data, filename);
     dispatch({ type: "REQUEST_FILE_LINK", payload: { filename } });
     fetch(ENDPOINT_RESOURCE_LAMBDA, {
         body: JSON.stringify(data),
         headers,
         method: "POST"
     }).then(response => {
-        //console.log("Received response", response);
+        console.log("Received response", response);
         if (response.status !== 200) {
             console.error("Status not 200", response.status);
             throw new Error(response);
         }
         return response.json();
     }).then(responseJson => {
-        //console.log("Response json", responseJson);
+        console.log("Response json", responseJson);
         if (!responseJson.url) {
             console.error("No url in response");
             throw new Error(responseJson);
@@ -115,25 +117,27 @@ export const getResourceFromLink = (url) => dispatch => {
 }
 
 export const getResource = (resourceName, resourceType, page, receipt) => dispatch => {
-    let filename = getFilenameByResourceType(resourceName, resourceType);
+    let filename = getFilenameByResourceType(resourceName, resourceType, page);
     let data = {
         resource_type: resourceType,
         resource_name: resourceName
     };
-    if (page) {
+    console.log('xxx page', page, typeof page, filename);
+    if (typeof page === "number") {
         data.page = page;
     }
+    console.log(data);
     if (receipt) {
         data.receipt = receipt;
     }
-    //console.log("Fetching resource " + ENDPOINT_RESOURCE_LAMBDA, data, filename);
+    console.log("Fetching resource " + ENDPOINT_RESOURCE_LAMBDA, data, filename);
     dispatch({ type: "REQUEST_FILE_CACHE", payload: { filename } });
     fetch(ENDPOINT_RESOURCE_LAMBDA, {
         body: JSON.stringify(data),
         headers,
         method: "POST"
     }).then(response => {
-        //console.log("Received response", response);
+        console.log("Received response", response);
         if (response.status !== 200) {
             console.error("Status not 200", response.status);
             if (response.status === 401 && (resourceType === RESOURCE_TYPE.ISSUE || resourceType === RESOURCE_TYPE.ISSUE_IMG)) {
@@ -144,7 +148,7 @@ export const getResource = (resourceName, resourceType, page, receipt) => dispat
         }
         return response.json();
     }).then(responseJson => {
-        //console.log("Response json", responseJson);
+        console.log("Response json", responseJson);
         if (!responseJson.url) {
             console.error("No url in response");
             throw new Error(responseJson);

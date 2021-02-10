@@ -28,6 +28,7 @@ const ViewIssue = ({
 
     if (!selectedIssue || !fileCacheMap) {
         goBack();
+        return null;
     }
 
     let resourceName = selectedIssue.upload_timestamp;
@@ -37,6 +38,7 @@ const ViewIssue = ({
 
     if (issueDownloadStatus === FILE_RETRIEVAL_STATUS.NOT_STARTED) {
         goBack();
+        return null;
     }
 
     return <View style={styles.container}>
@@ -44,12 +46,7 @@ const ViewIssue = ({
             <React.Fragment>
                 <ImageListViewer
                     filenames={getIssueFilenames(resourceName, fileCacheMap)} />
-                <Button
-                    color={styleConstants.passiveButton.color}
-                    onPress={goBack}
-                    style={styles.goBackButton}
-                    title={"Back"}
-                />
+
             </React.Fragment>
         }
         { issueDownloadStatus === FILE_RETRIEVAL_STATUS.REQUESTED &&

@@ -24,13 +24,15 @@ const PreviewIssue = ({
     getIssuePreview,
     navigation, 
     removeIssuePreview,
+    resetSelectedIssue,
     selectedIssue
 }) => {
 
-    const goBack = () => navigation && navigation.goBack && navigation.goBack();
+    const goBack = () => navigation && navigation.navigate && navigation.navigate('RootTabNavigator');
 
     if (!selectedIssue || !fileCacheMap) {
         goBack();
+        return null;
     }
 
     let resourceName = selectedIssue.upload_timestamp;
@@ -49,12 +51,6 @@ const PreviewIssue = ({
             <React.Fragment>
                 <ImageListViewer
                     filenames={getIssuePreviewFilenames(resourceName, fileCacheMap)} />
-                <Button
-                    color={styleConstants.passiveButton.color}
-                    onPress={goBack}
-                    style={styles.goBackButton}
-                    title={"Back"}
-                />
             </React.Fragment>
         }
         { issueDownloadStatus === FILE_RETRIEVAL_STATUS.REQUESTED &&
@@ -83,6 +79,7 @@ const PreviewIssue = ({
                     color={styleConstants.actionButton.color}
                     onPress={() => {
                         cancelIssuePreviewDownload(resourceName, fileCacheMap);
+                        resetSelectedIssue();
                         goBack();
                     }}
                     style={styles.cancelDownloadButton}
@@ -97,7 +94,19 @@ const PreviewIssue = ({
             </View>
         }
         { issueDownloadStatus === FILE_RETRIEVAL_STATUS.FAILED &&
-            <Text>There was a problem fetching the file. Try again in a few minutes. <ErrorHelperText /></Text>
+            <View style={styles.errorTextContainer}>
+                <Text style={styles.errorText}>There was a problem fetching the file.</Text>
+                <Button
+                    color={styleConstants.passiveButton.color}
+                    onPress={() => {
+                        removeIssuePreview(resourceName)
+                        goBack();
+                    }}
+                    style={styles.goBackButton}
+                    title={"Go Back"}
+                />
+                <ErrorHelperText />
+            </View>
         }
     </View>;
 };
@@ -112,7 +121,18 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: "center",
+        flexDirection: "column",
         backgroundColor: "#000"
+    },
+    errorTextContainer: {
+        flex: 1,
+        flexDirection: "column",
+        justifyContent: "center"
+    },
+    errorText: {
+        color: "#DDD",
+        textAlign: "center",
+        padding: 12
     },
     goBackButton: {
     },
@@ -180,7 +200,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     cancelIssuePreviewDownload: (resourceName, fileCacheMap) => dispatch(cancelIssuePreviewDownloadAction(resourceName, fileCacheMap)),
     getIssuePreview: (resourceName) => dispatch(getIssuePreviewAction(resourceName)),
-    removeIssuePreview: (resourceName) => dispatch(removeIssuePreviewAction(resourceName))
+    removeIssuePreview: (resourceName) => dispatch(removeIssuePreviewAction(resourceName)),
+    resetSelectedIssue: () => dispatch({ type: "SELECT_ISSUE", payload: {} })
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PreviewIssue);

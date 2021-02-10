@@ -13,9 +13,8 @@ export const getIssueDownloadProgress = (resourceName, resourceType, totalPages,
         .filter(key => key.includes(resourceType === RESOURCE_TYPE.PREVIEW_IMG 
             ? getPreviewImagePrefix(resourceName) 
             : getIssueImagePrefix(resourceName)))
-        .filter(key => fileCacheMap[key].status === FILE_RETRIEVAL_STATUS.IN_PROGRESS)
-        .filter(key => !!fileCacheMap[key].progress)
-        .map(key => fileCacheMap[key].progress);
+        .filter(key => fileCacheMap[key].status === FILE_RETRIEVAL_STATUS.IN_PROGRESS || fileCacheMap[key].status === FILE_RETRIEVAL_STATUS.COMPLETED)
+        .map(key => (!!fileCacheMap[key].progress ? fileCacheMap[key].progress : 1))
         .reduce((acc, cur) => acc + (cur/totalPages), 0);
 
 export const getIssuePreviewDownloadProgress = (resourceName, fileCacheMap) =>
@@ -51,12 +50,26 @@ export const getIssueDownloadStatus = (resourceName, resourceType, totalPages, f
 export const getIssuePreviewDownloadStatus = (resourceName, fileCacheMap) =>
     getIssueDownloadStatus(resourceName, RESOURCE_TYPE.PREVIEW_IMG, NUMBER_OF_PREVIEW_PAGES, fileCacheMap);
 
+const getIssuePageNumberFromFilename = (localPath) => {
+    const regex = /[\/a-zA-Z0-9-]+_issue-([0-9]+)\.[a-zA-Z]{3}/gm;
+    let result = regex.exec(localPath);
+    return parseInt(result[1]);
+}
+
+const getPreviewPageNumberFromFilename = (localPath) => {
+    const regex = /[\/a-zA-Z0-9-]+_preview-([0-9]+)\.[a-zA-Z]{3}/gm;
+    let result = regex.exec(localPath);
+    return parseInt(result[1]);
+}
+
 export const getIssueFilenames = (resourceName, fileCacheMap) =>
     Object.keys(fileCacheMap)
         .filter(key => key.includes(getIssueImagePrefix(resourceName)))
-        .map(key => fileCacheMap[key].localPath);
+        .map(key => fileCacheMap[key].localPath)
+        .sort((a, b) => getIssuePageNumberFromFilename(a) > getIssuePageNumberFromFilename(b) ? 1 : -1);
 
 export const getIssuePreviewFilenames = (resourceName, fileCacheMap) =>
     Object.keys(fileCacheMap)
         .filter(key => key.includes(getPreviewImagePrefix(resourceName)))
-        .map(key => fileCacheMap[key].localPath);
+        .map(key => fileCacheMap[key].localPath)
+        .sort((a, b) => getPreviewPageNumberFromFilename(a) > getPreviewPageNumberFromFilename(b) ? 1 : -1);

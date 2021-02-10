@@ -65,7 +65,6 @@ const IssueList = ({
     }
 
     const firstUnlockedPublishTimestamp = getFirstUnlockedPublishTimestamp(activeSubscription, issueList);
-    // console.log(ownedProducts, firstUnlockedPublishTimestamp);
 
     const getProduct = (issue) => {
         if (!!availableProducts && availableProducts.length > 0) {

@@ -11,13 +11,13 @@ export const getIssueList = () => (dispatch) => {
             value: true
         }
     });
-    //console.log("Fetching " + ENDPOINT_ISSUE_LIST_LAMBDA);
+    console.log("Fetching " + ENDPOINT_ISSUE_LIST_LAMBDA);
     fetch(ENDPOINT_ISSUE_LIST_LAMBDA, {
         headers: {
             'Content-Type': 'application/json'
         },
     }).then(response => {
-        //console.log("Completed issue list request", response);
+        console.log("Completed issue list request", response);
         dispatch({
             type: "REQUESTING",
             payload: {
@@ -31,7 +31,7 @@ export const getIssueList = () => (dispatch) => {
             return response.json();
         }
     }).then(responseJson => {
-        //console.log("Returning issue list json", responseJson);
+        console.log("Returning issue list json", responseJson);
         dispatch({
             type: "ISSUE_LIST",
             payload: responseJson
@@ -44,13 +44,13 @@ export const getIssueList = () => (dispatch) => {
                     resourceName: issue.upload_timestamp,
                     resourceType: RESOURCE_TYPE.HERO
                 }
-            });
+            })
         );
 
         // Fetch apple store product info
         dispatch(getAvailableProducts(responseJson.issues.map(issue => issue.sku)));
     }).catch(err => {
-        //console.log(err);
+        console.log(err);
         dispatch({
             type: "REQUESTING",
             payload: {

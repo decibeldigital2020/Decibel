@@ -28,3 +28,7 @@ export const ACCORDION_DURATION = 300;
 export const MAX_PREVIEW_CACHE_SIZE = 5;
 export const NUMBER_OF_PREVIEW_PAGES = 15;
 export const MAX_INFLIGHT_DOWNLOADS = 10;
+export const ORIENTATIONS = {
+    "LANDSCAPE": "LANDSCAPE",
+    "PORTRAIT": "PORTRAIT"
+};

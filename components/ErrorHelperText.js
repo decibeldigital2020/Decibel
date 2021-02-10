@@ -4,9 +4,10 @@ import { DECIBEL_HELP_URL } from '../constants';
 
 const ErrorHelperText = ({}) => {
     return <View style={styles.container}>
+        <Text style={styles.errorHelperText}>To contact us for help, please visit: </Text>
         <Text 
             onPress={() => Linking.openURL(DECIBEL_HELP_URL)}
-            style={styles.errorHelperText}>
+            style={styles.errorHelperLink}>
             { DECIBEL_HELP_URL }
         </Text>
     </View>;
@@ -15,13 +16,22 @@ const ErrorHelperText = ({}) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        flexDirection: "row",
-        margin: 12
+        flexDirection: "column",
+        justifyContent: "center",
+        padding: 12,
+        maxHeight: 100
     },
-    errorHelperText: {
+    errorHelperLink: {
+        textAlign: 'center',
         fontWeight: "400",
         fontSize: 18,
         color: "#99F"
+    },
+    errorHelperText: {
+        textAlign: 'center',
+        fontWeight: "400",
+        fontSize: 18,
+        color: "#FFF"
     }
 });
 

@@ -4,6 +4,7 @@
 import 'react-native-gesture-handler';
 import React from 'react';
 import {
+  Dimensions,
   SafeAreaView,
   StyleSheet,
   StatusBar,
@@ -20,6 +21,8 @@ import InAppPurchaseHandler from './components/InAppPurchaseHandler';
 import ProcessingTransaction from './components/ProcessingTransaction';
 import Navigation from './components/Navigation';
 import DownloadQueueProcessor from './components/DownloadQueueProcessor';
+import OrientationListener from './components/OrientationListener';
+import { ORIENTATIONS } from './constants';
 
 const persistedReducerConfig = {
   key: 'root',
@@ -31,18 +34,39 @@ const persistor = persistStore(store);
 
 const App = ({build, version}) => {
 
+  const [orientation, setOrientation] = React.useState(null);
+
+  React.useEffect(() => {
+    const window = Dimensions.get('window');
+    if (window.height > window.width) {
+      setOrientation(ORIENTATIONS.PORTRAIT);
+    } else {
+      setOrientation(ORIENTATIONS.LANDSCAPE);
+    }
+  });
+
+  const onLayout = (e) => {
+    const {width, height} = Dimensions.get('window');
+    if (height > width) {
+      setOrientation(ORIENTATIONS.PORTRAIT);
+    } else {
+      setOrientation(ORIENTATIONS.LANDSCAPE);
+    }
+  }
+
   const getFullVersion = () => (version + '.' + build);
 
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container} onLayout={onLayout}>
           <StatusBar barStyle="light-content" backgroundColor={styleConstants.statusBar.backgroundColor} />
           { !__DEV__ && <InAppPurchaseHandler /> }
           <Navigation
             version={getFullVersion()} />
           <ProcessingTransaction />
           <DownloadQueueProcessor />
+          <OrientationListener orientation={orientation} />
         </SafeAreaView>
       </PersistGate>
     </Provider>
