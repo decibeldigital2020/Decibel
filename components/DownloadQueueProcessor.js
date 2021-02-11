@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { FILE_RETRIEVAL_STATUS, MAX_INFLIGHT_DOWNLOADS } from '../constants';
+import { FILE_RETRIEVAL_STATUS, MAX_INFLIGHT_DOWNLOADS, RESOURCE_TYPE } from '../constants';
 import { getResource as getResourceAction } from '../actions/fileRetrievalActions';
 import { getFilenameByResourceType } from '../util/fileRetrievalUtil';
 
@@ -9,9 +9,36 @@ const getInProgressDownloadCount = fileCacheMap =>
         fileCacheMap[key].status === FILE_RETRIEVAL_STATUS.REQUESTED 
             || fileCacheMap[key].status === FILE_RETRIEVAL_STATUS.IN_PROGRESS).length;
 
-const DownloadQueueProcessor = ({downloadQueue, fileCacheMap, getResource, queuePop}) => {
+const DownloadQueueProcessor = ({
+    activeSubscription,
+    downloadQueue, 
+    fileCacheMap, 
+    getResource, 
+    issueList,
+    ownedProducts,
+    queuePop
+}) => {
     console.log("downloadQueue", downloadQueue);
-    
+
+    const getIssueSku = resourceName => 
+        (results => results && results[0] && results[0].sku)(issueList.issues.filter(issue => issue.upload_timestamp === resourceName))
+
+    const getPurchase = resourceName => {
+        if (!ownedProducts || !ownedProducts.length) {
+            return null;
+        }
+        let index = ownedProducts.findIndex(product => product.productId === getIssueSku(resourceName));
+        if (index !== -1) {
+            return ownedProducts[index];
+        } else {
+            return activeSubscription;
+        }
+    }
+
+    const getReceipt = (resourceName, resourceType) => 
+        resourceType === RESOURCE_TYPE.ISSUE_IMG && 
+            (purchase => purchase && purchase.transactionReceipt)(getPurchase(resourceName));
+
     React.useEffect(() => {
         if (getInProgressDownloadCount(fileCacheMap) < MAX_INFLIGHT_DOWNLOADS && downloadQueue.length > 0) {
             // More things are on the queue. Start downloading them.
@@ -21,7 +48,7 @@ const DownloadQueueProcessor = ({downloadQueue, fileCacheMap, getResource, queue
                 getResource(next.resourceName, 
                     next.resourceType, 
                     next.page, 
-                    next.receipt);
+                    getReceipt(next.resourceName, next.resourceType));
             }
             queuePop(next);
         }
@@ -31,8 +58,11 @@ const DownloadQueueProcessor = ({downloadQueue, fileCacheMap, getResource, queue
 }
 
 const mapStateToProps = state => ({
+    activeSubscription: state.activeSubscription,
     downloadQueue: state.downloadQueue,
-    fileCacheMap: state.fileCacheMap
+    fileCacheMap: state.fileCacheMap,
+    issueList: state.issueList,
+    ownedProducts: state.ownedProducts
 });
 
 const mapDispatchToProps = dispatch => ({

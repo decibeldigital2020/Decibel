@@ -13,16 +13,16 @@ import {
 import { connect } from 'react-redux';
 import { getIssueList as getIssueListAction } from '../actions/issueListActions';
 import IssueListItem from './IssueListItem';
-import { FILE_RETRIEVAL_STATUS, MAX_ISSUE_LIST_AGE } from '../constants';
+import { FILE_RETRIEVAL_STATUS, MAX_ISSUE_LIST_AGE, RESOURCE_TYPE } from '../constants';
 import { styleConstants } from '../constants/styles';
 import SplashScreen from 'react-native-splash-screen';
-import { getIssueFilename } from '../util/fileRetrievalUtil';
 import { getFirstUnlockedPublishTimestamp } from '../util/subscriptionsUtil';
 import {
     ALL_SUBSCRIPTIONS
 } from '../constants/products';
 import { getAvailableSubscriptions as getAvailableSubscriptionsAction } from '../actions/iapActions';
 import RestorePurchasesButton from './RestorePurchasesButton';
+import { getIssueDownloadStatus } from '../util/issueRetrievalUtil';
 
 const issueListIsAlive = issueListRequestedTimestamp => 
     (issueListRequestedTimestamp + MAX_ISSUE_LIST_AGE) >= Date.now();
@@ -76,18 +76,6 @@ const IssueList = ({
         return null;
     }
 
-    const getPurchase = issue => {
-        if (!ownedProducts || !ownedProducts.length) {
-            return null;
-        }
-        let index = ownedProducts.findIndex(product => product.productId === issue.sku);
-        if (index !== -1) {
-            return ownedProducts[index];
-        } else {
-            return activeSubscription;
-        }
-    }
-
     const subscriptionIncludesIssue = (issue) =>
         !!activeSubscription && 
             !!issue.subscription_associations && 
@@ -100,9 +88,7 @@ const IssueList = ({
 
     const data = !!downloadsOnly 
         ? issueList.issues.filter(issue => 
-            Object.keys(fileCacheMap)
-                .filter(filename => fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.COMPLETED)
-                .includes(getIssueFilename(issue.upload_timestamp)))
+            getIssueDownloadStatus(issue.upload_timestamp, RESOURCE_TYPE.ISSUE_IMG, issue.total_pages, fileCacheMap) === FILE_RETRIEVAL_STATUS.COMPLETED)
         : (!!ownedOnly
             ? issueList.issues.filter(isIssueOwned)
             : issueList.issues);
@@ -123,7 +109,6 @@ const IssueList = ({
                             navigation={navigation} 
                             owned={!!ownedOnly || isIssueOwned(issue.item)}
                             product={getProduct(issue.item)}
-                            purchase={getPurchase(issue.item)}
                             />}
                     keyExtractor={issue => issue.product_id}
                     showsVerticalScrollIndicator={false}

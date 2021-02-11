@@ -1162,6 +1162,11 @@
   "resolved" "https://registry.npmjs.org/@react-native-community/progress-view/-/progress-view-1.2.3.tgz"
   "version" "1.2.3"
 
+"@react-native-picker/picker@^1.9.10":
+  "integrity" "sha512-g0C0RLjXXGE4UfmGxNtAOY3LE5Epz8+ck/rB1oErJowskIIG83U6LVqH9oFrx1Hq1k/lbVQGgabURlE0QQ1MHA=="
+  "resolved" "https://registry.npmjs.org/@react-native-picker/picker/-/picker-1.9.10.tgz"
+  "version" "1.9.10"
+
 "@react-navigation/bottom-tabs@^5.11.2":
   "integrity" "sha512-7+hH00N9Ze74VcX8uYWVyXFXZ0Fwid+lG+SSLtmnJjk1Y6oIQpQ17EPqKO0UZlKKjhsvMlAnL5fdgFtoqnSjcA=="
   "resolved" "https://registry.npmjs.org/@react-navigation/bottom-tabs/-/bottom-tabs-5.11.2.tgz"

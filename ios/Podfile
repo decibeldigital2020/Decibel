@@ -23,12 +23,3 @@ target 'Decibel' do
     flipper_post_install(installer)
   end
 end
-
-target 'Decibel-tvOS' do
-  # Pods for Decibel-tvOS
-
-  target 'Decibel-tvOSTests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
-end

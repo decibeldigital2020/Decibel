@@ -48,10 +48,10 @@ const PreviewIssue = ({
 
     return <View style={styles.container}>
         { issueDownloadStatus === FILE_RETRIEVAL_STATUS.COMPLETED &&
-            <React.Fragment>
-                <ImageListViewer
-                    filenames={getIssuePreviewFilenames(resourceName, fileCacheMap)} />
-            </React.Fragment>
+            <ImageListViewer
+                filenames={getIssuePreviewFilenames(resourceName, fileCacheMap)}
+                goBack={goBack}
+                resourceType={RESOURCE_TYPE.PREVIEW_IMG} />
         }
         { issueDownloadStatus === FILE_RETRIEVAL_STATUS.REQUESTED &&
             <View style={styles.requested}>

@@ -50,13 +50,13 @@ export const getIssueDownloadStatus = (resourceName, resourceType, totalPages, f
 export const getIssuePreviewDownloadStatus = (resourceName, fileCacheMap) =>
     getIssueDownloadStatus(resourceName, RESOURCE_TYPE.PREVIEW_IMG, NUMBER_OF_PREVIEW_PAGES, fileCacheMap);
 
-const getIssuePageNumberFromFilename = (localPath) => {
+export const getIssuePageNumberFromFilename = (localPath) => {
     const regex = /[\/a-zA-Z0-9-]+_issue-([0-9]+)\.[a-zA-Z]{3}/gm;
     let result = regex.exec(localPath);
     return parseInt(result[1]);
 }
 
-const getPreviewPageNumberFromFilename = (localPath) => {
+export const getPreviewPageNumberFromFilename = (localPath) => {
     const regex = /[\/a-zA-Z0-9-]+_preview-([0-9]+)\.[a-zA-Z]{3}/gm;
     let result = regex.exec(localPath);
     return parseInt(result[1]);

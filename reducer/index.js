@@ -13,8 +13,7 @@ const initialState = {
         // {
         //     resourceName,
         //     resourceType,
-        //     page,
-        //     receipt
+        //     page
         // }
     ],
     fileCacheMap: {
@@ -49,8 +48,7 @@ const initialState = {
          * name: oneOf: [true, false]
          */
     },
-    selectedIssue: null, // item from mocks.issueListResponse.issues
-    selectedReceipt: null // IAP.Purchase
+    selectedIssue: null // item from mocks.issueListResponse.issues
 };
 
 const reducer = (state = initialState, action) => {
@@ -105,8 +103,7 @@ const reducer = (state = initialState, action) => {
             let index = newDownloadQueue.findIndex(q => 
                 q.resourceName === action.payload.resourceName &&
                 q.resourceType === action.payload.resourceType &&
-                q.page === action.payload.page &&
-                q.receipt === action.payload.receipt);
+                q.page === action.payload.page);
             if (index !== -1) {
                 newDownloadQueue.splice(index, 1);
             }
@@ -221,14 +218,11 @@ const reducer = (state = initialState, action) => {
                 let index = newState.issueList.issues.findIndex(issue => issue.product_id === action.payload.productId);
                 if (index !== -1) {
                     newState.selectedIssue = newState.issueList.issues[index];
-                    newState.selectedReceipt = action.payload.receipt;
                 } else {
                     newState.selectedIssue = null;
-                    newState.selectedReceipt = null;
                 }
             } else {
                 newState.selectedIssue = null;
-                newState.selectedReceipt = null;
             }
             return newState;
         }

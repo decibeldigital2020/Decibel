@@ -25,7 +25,10 @@ import {
     removeIssue as removeIssueAction 
 } from '../actions/issueRetrievalActions';
 import { requestNewPurchase as requestNewPurchaseAction } from '../actions/iapActions';
-import { getIssueFilename } from '../util/fileRetrievalUtil';
+import { 
+    getIssueDownloadStatus,
+    getIssueDownloadProgress 
+} from '../util/issueRetrievalUtil';
 
 const IssueListItem = ({ 
     controlAccordion, 
@@ -36,7 +39,6 @@ const IssueListItem = ({
     owned, 
     navigation, 
     product,
-    purchase,
     requestNewPurchase,
     removeIssue, 
     selectIssue 
@@ -61,11 +63,6 @@ const IssueListItem = ({
             ? product.localizedPrice
             : "";
 
-    const getReceipt = () =>
-        purchase
-            ? purchase.transactionReceipt
-            : null;
-
     const toggleAccordion = () => {
         let newValue = !accordionOpen;
         Animated.timing(animatedController, {
@@ -77,7 +74,9 @@ const IssueListItem = ({
         setAccordionOpen(newValue);
     };
 
-    const filename = getIssueFilename(issue.upload_timestamp);
+    let resourceName = issue.upload_timestamp;
+    let totalPages = issue.total_pages;
+    let issueDownloadStatus = getIssueDownloadStatus(resourceName, RESOURCE_TYPE.ISSUE_IMG, totalPages, fileCacheMap);
 
     return <View style={styles.issueListItemContainer}>
         <TouchableOpacity style={styles.issueListItem} onPress={toggleAccordion}>
@@ -117,18 +116,18 @@ const IssueListItem = ({
                             />
                         </View>
                     }
-                    { !!owned && (!fileCacheMap[filename] || fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.FAILED) && 
+                    { !!owned && (issueDownloadStatus === FILE_RETRIEVAL_STATUS.NOT_STARTED || issueDownloadStatus === FILE_RETRIEVAL_STATUS.FAILED) && 
                         <View style={styles.actionButton}>
                             <Button 
                                 color={styleConstants.button.color}
                                 title={"Download Issue"}
                                 onPress={() => {
-                                    getIssue(issue.upload_timestamp, issue.total_pages, getReceipt());
+                                    getIssue(issue.upload_timestamp, issue.total_pages);
                                 }}
                             />
                         </View>
                     }
-                    { !!owned && fileCacheMap[filename] && fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.REQUESTED &&
+                    { !!owned && issueDownloadStatus === FILE_RETRIEVAL_STATUS.REQUESTED &&
                         <View style={styles.actionButton}>
                             <Button 
                                 color={styleConstants.button.color}
@@ -138,25 +137,25 @@ const IssueListItem = ({
                             <ActivityIndicator size={"small"} color={styleConstants.activityIndicator.color} />
                         </View>
                     }
-                    { !!owned && fileCacheMap[filename] && fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.IN_PROGRESS &&
+                    { !!owned && issueDownloadStatus === FILE_RETRIEVAL_STATUS.IN_PROGRESS &&
                         <View style={styles.actionButton}>
                             <Button 
                                 color={styleConstants.button.color}
-                                title={"Downloading (" + Math.floor(fileCacheMap[filename].progress*100) + "%)"}
+                                title={"Downloading (" + Math.floor(getIssueDownloadProgress(resourceName, RESOURCE_TYPE.ISSUE_IMG, totalPages, fileCacheMap)*100) + "%)"}
                                 onPress={() => {
-                                    selectIssue(issue.product_id, getReceipt());
+                                    selectIssue(issue.product_id);
                                     navigation.navigate('ViewIssue');
                                 }}
                             />
                         </View>
                     }
-                    { !!owned && fileCacheMap[filename] && fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.COMPLETED &&
+                    { !!owned && issueDownloadStatus === FILE_RETRIEVAL_STATUS.COMPLETED &&
                         <View style={styles.actionButton}>
                             <Button 
                                 color={styleConstants.button.color}
                                 title={"View Issue"}
                                 onPress={() => {
-                                    selectIssue(issue.product_id, getReceipt());
+                                    selectIssue(issue.product_id);
                                     navigation.navigate('ViewIssue');
                                 }}
                             />
@@ -179,7 +178,7 @@ const IssueListItem = ({
                             <Text>{issue.description}</Text>
                         </View>
                     }
-                    { !!downloaded && fileCacheMap[filename] && fileCacheMap[filename].status === FILE_RETRIEVAL_STATUS.COMPLETED &&
+                    { !!downloaded && issueDownloadStatus === FILE_RETRIEVAL_STATUS.COMPLETED &&
                         <View style={styles.passiveButton}>
                             <Button 
                                 color={styleConstants.button.color}
@@ -360,10 +359,10 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = () => dispatch => ({
-    getIssue: (resourceName, totalPages, receipt) => dispatch(getIssueAction(resourceName, totalPages, receipt)),
+    getIssue: (resourceName, totalPages) => dispatch(getIssueAction(resourceName, totalPages)),
     removeIssue: (resourceName, totalPages) => dispatch(removeIssueAction(resourceName, totalPages)),
     requestNewPurchase: (sku) => dispatch(requestNewPurchaseAction(sku)),
-    selectIssue: (productId, receipt) => dispatch({ type: "SELECT_ISSUE", payload: { productId, receipt }})
+    selectIssue: (productId) => dispatch({ type: "SELECT_ISSUE", payload: { productId }})
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(IssueListItem);

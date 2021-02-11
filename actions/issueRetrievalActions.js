@@ -13,15 +13,14 @@ import {
 
 // Note: preview page numbers are 1 through N, while full issue page numbers are 0 through N-1
 
-export const getIssue = (resourceName, totalPages, receipt) => dispatch => {
+export const getIssue = (resourceName, totalPages) => dispatch => {
     for (let i = 0; i < totalPages; i++) {
         dispatch({
             type: "DOWNLOAD_QUEUE_PUSH",
             payload: {
                 resourceName,
                 resourceType: RESOURCE_TYPE.ISSUE_IMG,
-                page: i,
-                receipt
+                page: i
             }
         });
     }
@@ -53,15 +52,14 @@ export const removeIssuePreview = (resourceName) => dispatch => {
     }
 }
 
-export const cancelIssueDownload = (resourceName, totalPages, receipt, fileCacheMap) => dispatch => {
+export const cancelIssueDownload = (resourceName, totalPages, fileCacheMap) => dispatch => {
     for (let i = 0; i < totalPages; i++) {
         dispatch({
             type: "DOWNLOAD_QUEUE_POP",
             payload: {
                 resourceName,
                 resourceType: RESOURCE_TYPE.ISSUE_IMG,
-                page: i,
-                receipt
+                page: i
             }
         });
         let task = fileCacheMap[getIssueImageFilename(resourceName, i)].task;

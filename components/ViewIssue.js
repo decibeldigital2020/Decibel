@@ -3,13 +3,14 @@ import { ProgressView } from "@react-native-community/progress-view";
 import { connect } from 'react-redux';
 import { ActivityIndicator, Button, StyleSheet, Text, View } from 'react-native';
 import {
-    cancelIssueDownload as cancelIssueDownloadAction
+    cancelIssueDownload as cancelIssueDownloadAction,
+    removeIssue as removeIssueAction
 } from '../actions/issueRetrievalActions';
 import {
     getIssueDownloadProgress,
     getIssueDownloadStatus,
-    getIssueFilenames
-} from '../actions/issueRetrievalActions';
+    getIssueFilenames,
+} from '../util/issueRetrievalUtil';
 import { FILE_RETRIEVAL_STATUS, RESOURCE_TYPE } from '../constants';
 import { styleConstants } from '../constants/styles';
 import ErrorHelperText from './ErrorHelperText';
@@ -20,11 +21,10 @@ const ViewIssue = ({
     cancelIssueDownload,
     fileCacheMap, 
     navigation, 
-    selectedIssue,
-    selectedReceipt
+    selectedIssue
 }) => {
 
-    const goBack = () => navigation && navigation.goBack && navigation.goBack();
+    const goBack = () => navigation && navigation.navigate && navigation.navigate('RootTabNavigator');
 
     if (!selectedIssue || !fileCacheMap) {
         goBack();
@@ -43,11 +43,10 @@ const ViewIssue = ({
 
     return <View style={styles.container}>
         { issueDownloadStatus === FILE_RETRIEVAL_STATUS.COMPLETED &&
-            <React.Fragment>
-                <ImageListViewer
-                    filenames={getIssueFilenames(resourceName, fileCacheMap)} />
-
-            </React.Fragment>
+            <ImageListViewer
+                filenames={getIssueFilenames(resourceName, fileCacheMap)}
+                goBack={goBack}
+                resourceType={RESOURCE_TYPE.ISSUE_IMG} />
         }
         { issueDownloadStatus === FILE_RETRIEVAL_STATUS.REQUESTED &&
             <View style={styles.requested}>
@@ -74,7 +73,8 @@ const ViewIssue = ({
                 <Button
                     color={styleConstants.actionButton.color}
                     onPress={() => {
-                        cancelIssueDownload(resourceName, totalPages, selectedReceipt, fileCacheMap);
+                        cancelIssueDownload(resourceName, totalPages, fileCacheMap);
+                        resetSelectedIssue();
                         goBack();
                     }}
                     style={styles.cancelDownloadButton}
@@ -89,7 +89,19 @@ const ViewIssue = ({
             </View>
         }
         { issueDownloadStatus === FILE_RETRIEVAL_STATUS.FAILED &&
-            <Text>There was a problem fetching the file. Try again in a few minutes. <ErrorHelperText /></Text>
+            <View style={styles.errorTextContainer}>
+                <Text style={styles.errorText}>There was a problem fetching the file.</Text>
+                <Button
+                    color={styleConstants.passiveButton.color}
+                    onPress={() => {
+                        removeIssue(resourceName, totalPages);
+                        goBack();
+                    }}
+                    style={styles.goBackButton}
+                    title={"Go Back"}
+                />
+                <ErrorHelperText />
+            </View>
         }
     </View>;
 };
@@ -104,7 +116,18 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: "center",
+        flexDirection: "column",
         backgroundColor: "#000"
+    },
+    errorTextContainer: {
+        flex: 1,
+        flexDirection: "column",
+        justifyContent: "center"
+    },
+    errorText: {
+        color: "#DDD",
+        textAlign: "center",
+        padding: 12
     },
     goBackButton: {
     },
@@ -166,12 +189,12 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
     fileCacheMap: state.fileCacheMap,
-    selectedIssue: state.selectedIssue,
-    selectedReceipt: state.selectedReceipt
+    selectedIssue: state.selectedIssue
 });
 
 const mapDispatchToProps = dispatch => ({
-    cancelIssueDownload: (resourceName, totalPages, receipt, fileCacheMap) => dispatch(cancelIssueDownloadAction(resourceName, totalPages, receipt, fileCacheMap))
+    cancelIssueDownload: (resourceName, totalPages, fileCacheMap) => dispatch(cancelIssueDownloadAction(resourceName, totalPages, fileCacheMap)),
+    removeIssue: (resourceName, totalPages) => dispatch(removeIssueAction(resourceName, totalPages)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewIssue);
