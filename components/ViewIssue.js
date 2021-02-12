@@ -70,7 +70,7 @@ const ViewIssue = ({
                         progress={getIssueDownloadProgress(resourceName, resourceType, totalPages, fileCacheMap)}
                     />
                 </View>
-                <Button
+                {/*<Button
                     color={styleConstants.actionButton.color}
                     onPress={() => {
                         cancelIssueDownload(resourceName, totalPages, fileCacheMap);
@@ -79,7 +79,7 @@ const ViewIssue = ({
                     }}
                     style={styles.cancelDownloadButton}
                     title={"Cancel download"}
-                />
+                />*/}
                 <Button
                     color={styleConstants.passiveButton.color}
                     onPress={goBack}

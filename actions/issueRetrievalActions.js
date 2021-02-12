@@ -11,8 +11,6 @@ import {
     removeResource
 } from './fileRetrievalActions';
 
-// Note: preview page numbers are 1 through N, while full issue page numbers are 0 through N-1
-
 export const getIssue = (resourceName, totalPages) => dispatch => {
     for (let i = 0; i < totalPages; i++) {
         dispatch({
@@ -63,9 +61,11 @@ export const cancelIssueDownload = (resourceName, totalPages, fileCacheMap) => d
             }
         });
         let task = fileCacheMap[getIssueImageFilename(resourceName, i)].task;
-        dispatch(cancelGetResource(getIssueImageFilename(resourceName, i), task));
-        dispatch(removeIssue(resourceName, totalPages));
+        if (task) {
+            dispatch(cancelGetResource(getIssueImageFilename(resourceName, i), task));
+        }
     }
+    dispatch(removeIssue(resourceName, totalPages));
 }
 
 export const cancelIssuePreviewDownload = (resourceName, fileCacheMap) => dispatch => {
@@ -80,7 +80,9 @@ export const cancelIssuePreviewDownload = (resourceName, fileCacheMap) => dispat
             }
         });
         let task = fileCacheMap[getIssueImageFilename(resourceName, page)].task;
-        dispatch(cancelGetResource(getPreviewImageFilename(resourceName, page), task));
-        dispatch(removeIssuePreview(resourceName));
+        if (task) {
+            dispatch(cancelGetResource(getPreviewImageFilename(resourceName, page), task));
+        }
     }
+    dispatch(removeIssuePreview(resourceName));
 }

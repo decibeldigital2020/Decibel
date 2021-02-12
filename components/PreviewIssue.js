@@ -75,7 +75,7 @@ const PreviewIssue = ({
                         progress={getIssuePreviewDownloadProgress(resourceName, fileCacheMap)}
                     />
                 </View>
-                <Button
+                {/*<Button
                     color={styleConstants.actionButton.color}
                     onPress={() => {
                         cancelIssuePreviewDownload(resourceName, fileCacheMap);
@@ -84,7 +84,7 @@ const PreviewIssue = ({
                     }}
                     style={styles.cancelDownloadButton}
                     title={"Cancel download"}
-                />
+                />*/}
                 <Button
                     color={styleConstants.passiveButton.color}
                     onPress={goBack}
