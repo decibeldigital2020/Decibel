@@ -33,7 +33,9 @@ export const getIssueDownloadStatus = (resourceName, resourceType, totalPages, f
         return FILE_RETRIEVAL_STATUS.FAILED;
     }
     if (existingCacheKeys.filter(key => 
-            fileCacheMap[key].status === FILE_RETRIEVAL_STATUS.IN_PROGRESS).length > 0) {
+            fileCacheMap[key].status === FILE_RETRIEVAL_STATUS.IN_PROGRESS).length > 0
+            || (completedCount => completedCount > 0 && completedCount < totalPages)(existingCacheKeys.filter(key => 
+                fileCacheMap[key].status === FILE_RETRIEVAL_STATUS.COMPLETED).length)) {
         return FILE_RETRIEVAL_STATUS.IN_PROGRESS;
     }
     if (existingCacheKeys.filter(key => 

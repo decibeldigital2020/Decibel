@@ -5,6 +5,7 @@ import {
     FlatList,  
     Image, 
     Modal,
+    ScrollView,
     StyleSheet, 
     Text,
     TouchableOpacity, 
@@ -21,7 +22,7 @@ import {
 } from '../util/issueRetrievalUtil';
 
 const window = Dimensions.get("window");
-const MAX_ZOOM_FACTOR = 3.5;
+const MAX_ZOOM_FACTOR = 1.5;
 const SCROLL_WAIT_DURATION = 300;
 
 const ImageListViewer = ({ filenames, goBack, orientation, resourceType }) => {
@@ -62,15 +63,17 @@ const ImageListViewer = ({ filenames, goBack, orientation, resourceType }) => {
     let landscapeWidthRatio = Math.floor(height/HERO_IMAGE_RATIO);
     
     if (orientation === ORIENTATIONS.PORTRAIT) {
+        height = portraitHeightRatio;
         imageViewStyle = {
             flex: 1,
             width: width,
-            height: portraitHeightRatio
+            height: height
         };
     } else {
+        width = landscapeWidthRatio;
         imageViewStyle = {
             flex: 1,
-            width: landscapeWidthRatio,
+            width: width,
             height: height
         };
     }
@@ -81,7 +84,7 @@ const ImageListViewer = ({ filenames, goBack, orientation, resourceType }) => {
             horizontal
             keyExtractor={item => item}
             initialNumToRender={15}
-            maximumZoomScale={MAX_ZOOM_FACTOR}
+            maximumZoomScale={1}
             minimumZoomScale={1}
             onScrollToIndexFailed={info => {
                 // console.log(info.averageItemLength, info);
@@ -101,8 +104,10 @@ const ImageListViewer = ({ filenames, goBack, orientation, resourceType }) => {
                     activeOpacity={1} 
                     onPress={() => setMenuOpen(!menuOpen)}>
                     <Image 
+                        height={height}
+                        width={width}
                         source={{ uri: item }}
-                        style={styles.image}
+                        style={imageViewStyle}
                     />
                 </TouchableOpacity>
             }
@@ -182,7 +187,18 @@ const styles = StyleSheet.create({
         backgroundColor: "#000",
         borderRadius: 15,
         padding: 2,
-        maxHeight: 80,
+        maxHeight: 60,
+        marginBottom: 5,
+        marginRight: 5
+    },
+    activatedButton: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'center',
+        backgroundColor: "#333",
+        borderRadius: 15,
+        padding: 2,
+        maxHeight: 60,
         marginBottom: 5,
         marginRight: 5
     },
