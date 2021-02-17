@@ -4,8 +4,7 @@ import { connect } from 'react-redux';
 import { ActivityIndicator, Button, StyleSheet, Text, View } from 'react-native';
 import {
     cancelIssuePreviewDownload as cancelIssuePreviewDownloadAction,
-    getIssuePreview as getIssuePreviewAction,
-    removeIssuePreview as removeIssuePreviewAction
+    getIssuePreview as getIssuePreviewAction
 } from '../actions/issueRetrievalActions';
 import {
     getIssuePreviewDownloadProgress,
@@ -23,7 +22,6 @@ const PreviewIssue = ({
     fileCacheMap, 
     getIssuePreview,
     navigation, 
-    removeIssuePreview,
     resetSelectedIssue,
     selectedIssue
 }) => {
@@ -75,16 +73,15 @@ const PreviewIssue = ({
                         progress={getIssuePreviewDownloadProgress(resourceName, fileCacheMap)}
                     />
                 </View>
-                {/*<Button
+                <Button
                     color={styleConstants.actionButton.color}
-                    onPress={() => {
-                        cancelIssuePreviewDownload(resourceName, fileCacheMap);
+                    onPress={async () => {
+                        await cancelIssuePreviewDownload(resourceName, fileCacheMap);
                         resetSelectedIssue();
-                        goBack();
                     }}
                     style={styles.cancelDownloadButton}
                     title={"Cancel download"}
-                />*/}
+                />
                 <Button
                     color={styleConstants.passiveButton.color}
                     onPress={goBack}
@@ -98,9 +95,9 @@ const PreviewIssue = ({
                 <Text style={styles.errorText}>There was a problem fetching the file.</Text>
                 <Button
                     color={styleConstants.passiveButton.color}
-                    onPress={() => {
-                        removeIssuePreview(resourceName)
-                        goBack();
+                    onPress={async () => {
+                        await cancelIssuePreviewDownload(resourceName, fileCacheMap);
+                        resetSelectedIssue();
                     }}
                     style={styles.goBackButton}
                     title={"Go Back"}
@@ -200,7 +197,6 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     cancelIssuePreviewDownload: (resourceName, fileCacheMap) => dispatch(cancelIssuePreviewDownloadAction(resourceName, fileCacheMap)),
     getIssuePreview: (resourceName) => dispatch(getIssuePreviewAction(resourceName)),
-    removeIssuePreview: (resourceName) => dispatch(removeIssuePreviewAction(resourceName)),
     resetSelectedIssue: () => dispatch({ type: "SELECT_ISSUE", payload: {} })
 });
 

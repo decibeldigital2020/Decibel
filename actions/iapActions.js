@@ -49,7 +49,7 @@ export const getAvailableProducts = (skuList) => dispatch => {
     });  
     getProducts(skuList)
         .then(products => {
-            // console.log(products);
+            // // console.log(products);
             dispatch({
                 type: "AVAILABLE_PRODUCTS",
                 payload: products
@@ -84,7 +84,7 @@ export const getAvailableSubscriptions = (skuList) => dispatch => {
     });  
     getSubscriptions(skuList)
         .then(subscriptions => {
-            // console.log(subscriptions);
+            // // console.log(subscriptions);
             dispatch({
                 type: "AVAILABLE_SUBSCRIPTIONS",
                 payload: subscriptions
@@ -143,7 +143,7 @@ export const requestNewPurchase = sku => dispatch => {
     });
     requestPurchase(sku)
         .then(result => {
-            //console.log(result);
+            //// console.log(result);
         })
         .catch(err => {
             console.error("requestPurchase", err);
@@ -161,7 +161,7 @@ export const requestNewSubscription = sku => dispatch => {
     });
     requestSubscription(sku)
         .then(result => {
-            //console.log(result);
+            //// console.log(result);
         })
         .catch(err => {
             console.error("requestSubscription", err);
@@ -182,7 +182,7 @@ export const restorePurchases = () => dispatch => {
     });
     getAvailablePurchases()
         .then(result => {
-            // console.log(result);
+            // // console.log(result);
             dispatch({
                 type: "RESTORE_PURCHASES",
                 payload: result

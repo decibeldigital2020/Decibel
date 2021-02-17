@@ -93,7 +93,9 @@ const ImageListViewer = ({ filenames, goBack, orientation, resourceType }) => {
                 wait.then(() => {
                     // console.log(flatListRef.scrollToIndex);
                     flatListRef.scrollToIndex && flatListRef.scrollToIndex({ index: selectedPage, animated: true });
-                }).catch(err => {console.log(err)});
+                }).catch(err => {
+                    console.log(err)
+                });
             }}
             ref={(ref) => { setFlatListRef(ref); }}
             style={styles.flatList}

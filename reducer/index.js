@@ -8,6 +8,12 @@ const initialState = {
     availableSubscriptions: [
         // IAP.Product
     ],
+    cancelQueue: [
+        // {
+        //     resourceName,
+        //     resourceType
+        // }
+    ],
     currentVersion: null,
     downloadQueue: [
         // {
@@ -96,6 +102,23 @@ const reducer = (state = initialState, action) => {
                 url: action.payload.url
             });
             newState.fileLinkMap[action.payload.filename] = newLinkEntry;
+            return newState;
+        }
+        case "CANCEL_QUEUE_POP": {
+            let newCancelQueue = [...newState.cancelQueue];
+            let index = newCancelQueue.findIndex(q => 
+                q.resourceName === action.payload.resourceName &&
+                q.resourceType === action.payload.resourceType);
+            if (index !== -1) {
+                newCancelQueue.splice(index, 1);
+            }
+            newState.cancelQueue = newCancelQueue;
+            return newState;
+        }
+        case "CANCEL_QUEUE_PUSH": {
+            let newCancelQueue = [...newState.cancelQueue];
+            newCancelQueue.push(action.payload);
+            newState.cancelQueue = newCancelQueue;
             return newState;
         }
         case "DOWNLOAD_QUEUE_POP": {

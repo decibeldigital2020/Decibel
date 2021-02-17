@@ -3,6 +3,10 @@ import { connect } from 'react-redux';
 import { FILE_RETRIEVAL_STATUS, MAX_INFLIGHT_DOWNLOADS, RESOURCE_TYPE } from '../constants';
 import { getResource as getResourceAction } from '../actions/fileRetrievalActions';
 import { getFilenameByResourceType } from '../util/fileRetrievalUtil';
+import {
+    removeIssue as removeIssueAction,
+    removeIssuePreview as removeIssuePreviewAction
+} from '../actions/issueRetrievalActions';
 
 const getInProgressDownloadCount = fileCacheMap => 
     Object.keys(fileCacheMap).filter(key => 
@@ -11,14 +15,18 @@ const getInProgressDownloadCount = fileCacheMap =>
 
 const DownloadQueueProcessor = ({
     activeSubscription,
-    downloadQueue, 
+    cancelQueue,
+    cancelQueuePop,
+    downloadQueue,
+    downloadQueuePop, 
     fileCacheMap, 
     getResource, 
     issueList,
     ownedProducts,
-    queuePop
+    removeIssue,
+    removeIssuePreview
 }) => {
-    console.log("downloadQueue", downloadQueue);
+    // console.log("downloadQueue", downloadQueue);
 
     const getIssueSku = resourceName => 
         (results => results && results[0] && results[0].sku)(issueList.issues.filter(issue => issue.upload_timestamp === resourceName))
@@ -40,7 +48,15 @@ const DownloadQueueProcessor = ({
             (purchase => purchase && purchase.transactionReceipt)(getPurchase(resourceName));
 
     React.useEffect(() => {
-        if (getInProgressDownloadCount(fileCacheMap) < MAX_INFLIGHT_DOWNLOADS && downloadQueue.length > 0) {
+        if (cancelQueue.length > 0) {
+            let next = cancelQueue[0];
+            if (next.resourceType === RESOURCE_TYPE.PREVIEW_IMG) {
+                removeIssuePreview(resourceName);
+            } else {
+                removeIssue(resourceName);
+            }
+            cancelQueuePop(next);
+        } else if (getInProgressDownloadCount(fileCacheMap) < MAX_INFLIGHT_DOWNLOADS && downloadQueue.length > 0) {
             // More things are on the queue. Start downloading them.
             let next = downloadQueue[0];
             let existingEntry = fileCacheMap[getFilenameByResourceType(next.resourceName, next.resourceType, next.page)];
@@ -50,15 +66,16 @@ const DownloadQueueProcessor = ({
                     next.page, 
                     getReceipt(next.resourceName, next.resourceType));
             }
-            queuePop(next);
+            downloadQueuePop(next);
         }
-    }, [downloadQueue, fileCacheMap]);
+    }, [cancelQueue, downloadQueue, fileCacheMap]);
 
     return null;
 }
 
 const mapStateToProps = state => ({
     activeSubscription: state.activeSubscription,
+    cancelQueue: state.cancelQueue,
     downloadQueue: state.downloadQueue,
     fileCacheMap: state.fileCacheMap,
     issueList: state.issueList,
@@ -66,9 +83,12 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
+    cancelQueuePop: item => dispatch({ type: "CANCEL_QUEUE_POP", payload: item }),
+    downloadQueuePop: item => dispatch({ type: "DOWNLOAD_QUEUE_POP", payload: item }),
     getResource: (resourceName, resourceType, page, receipt) => 
         dispatch(getResourceAction(resourceName, resourceType, page, receipt)),
-    queuePop: item => dispatch({ type: "DOWNLOAD_QUEUE_POP", payload: item })
+    removeIssue: resourceName => dispatch(removeIssueAction(resourceName)),
+    removeIssuePreview: resourceName => dispatch(removeIssuePreviewAction(resourceName))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DownloadQueueProcessor);

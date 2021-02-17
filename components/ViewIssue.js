@@ -3,8 +3,7 @@ import { ProgressView } from "@react-native-community/progress-view";
 import { connect } from 'react-redux';
 import { ActivityIndicator, Button, StyleSheet, Text, View } from 'react-native';
 import {
-    cancelIssueDownload as cancelIssueDownloadAction,
-    removeIssue as removeIssueAction
+    cancelIssueDownload as cancelIssueDownloadAction
 } from '../actions/issueRetrievalActions';
 import {
     getIssueDownloadProgress,
@@ -20,7 +19,8 @@ import ImageListViewer from './ImageListViewer';
 const ViewIssue = ({
     cancelIssueDownload,
     fileCacheMap, 
-    navigation, 
+    navigation,
+    resetSelectedIssue, 
     selectedIssue
 }) => {
 
@@ -70,16 +70,15 @@ const ViewIssue = ({
                         progress={getIssueDownloadProgress(resourceName, resourceType, totalPages, fileCacheMap)}
                     />
                 </View>
-                {/*<Button
+                <Button
                     color={styleConstants.actionButton.color}
-                    onPress={() => {
-                        cancelIssueDownload(resourceName, totalPages, fileCacheMap);
+                    onPress={async () => {
+                        await cancelIssueDownload(resourceName, totalPages, fileCacheMap);
                         resetSelectedIssue();
-                        goBack();
                     }}
                     style={styles.cancelDownloadButton}
                     title={"Cancel download"}
-                />*/}
+                />
                 <Button
                     color={styleConstants.passiveButton.color}
                     onPress={goBack}
@@ -94,8 +93,8 @@ const ViewIssue = ({
                 <Button
                     color={styleConstants.passiveButton.color}
                     onPress={() => {
-                        removeIssue(resourceName, totalPages);
-                        goBack();
+                        await cancelIssueDownload(resourceName, totalPages, fileCacheMap);
+                        resetSelectedIssue();
                     }}
                     style={styles.goBackButton}
                     title={"Go Back"}
@@ -193,8 +192,9 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    cancelIssueDownload: (resourceName, totalPages, fileCacheMap) => dispatch(cancelIssueDownloadAction(resourceName, totalPages, fileCacheMap)),
-    removeIssue: (resourceName, totalPages) => dispatch(removeIssueAction(resourceName, totalPages)),
+    cancelIssueDownload: (resourceName, totalPages, fileCacheMap) => 
+        dispatch(cancelIssueDownloadAction(resourceName, totalPages, fileCacheMap)),
+    resetSelectedIssue: () => dispatch({ type: "SELECT_ISSUE", payload: {} })
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ViewIssue);
