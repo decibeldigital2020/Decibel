@@ -51,9 +51,9 @@ const DownloadQueueProcessor = ({
         if (cancelQueue.length > 0) {
             let next = cancelQueue[0];
             if (next.resourceType === RESOURCE_TYPE.PREVIEW_IMG) {
-                removeIssuePreview(resourceName);
+                removeIssuePreview(next.resourceName);
             } else {
-                removeIssue(resourceName);
+                removeIssue(next.resourceName);
             }
             cancelQueuePop(next);
         } else if (getInProgressDownloadCount(fileCacheMap) < MAX_INFLIGHT_DOWNLOADS && downloadQueue.length > 0) {

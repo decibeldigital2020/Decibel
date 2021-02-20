@@ -31,6 +31,7 @@ const IssueList = ({
     activeSubscription,
     availableProducts,
     availableSubscriptions,
+    canceledIssues,
     downloadsOnly, 
     fileCacheMap,
     getAvailableSubscriptions,
@@ -88,7 +89,7 @@ const IssueList = ({
 
     const data = !!downloadsOnly 
         ? issueList.issues.filter(issue => 
-            getIssueDownloadStatus(issue.upload_timestamp, RESOURCE_TYPE.ISSUE_IMG, issue.total_pages, fileCacheMap) === FILE_RETRIEVAL_STATUS.COMPLETED)
+            getIssueDownloadStatus(issue.upload_timestamp, RESOURCE_TYPE.ISSUE_IMG, issue.total_pages, fileCacheMap, canceledIssues) === FILE_RETRIEVAL_STATUS.COMPLETED)
         : (!!ownedOnly
             ? issueList.issues.filter(isIssueOwned)
             : issueList.issues);
@@ -176,6 +177,7 @@ const mapStateToProps = state => ({
     activeSubscription: state.activeSubscription,
     availableProducts: state.availableProducts,
     availableSubscriptions: state.availableSubscriptions,
+    canceledIssues: state.canceledIssues,
     fileCacheMap: state.fileCacheMap,
     issueList: state.issueList,
     issueListRequestedTimestamp: state.issueListRequestedTimestamp,

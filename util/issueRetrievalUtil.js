@@ -8,19 +8,24 @@ import {
     getIssueImagePrefix 
 } from '../util/fileRetrievalUtil';
 
-export const getIssueDownloadProgress = (resourceName, resourceType, totalPages, fileCacheMap) =>
-    Object.keys(fileCacheMap)
-        .filter(key => key.includes(resourceType === RESOURCE_TYPE.PREVIEW_IMG 
-            ? getPreviewImagePrefix(resourceName) 
-            : getIssueImagePrefix(resourceName)))
-        .filter(key => fileCacheMap[key].status === FILE_RETRIEVAL_STATUS.IN_PROGRESS || fileCacheMap[key].status === FILE_RETRIEVAL_STATUS.COMPLETED)
-        .map(key => (!!fileCacheMap[key].progress ? fileCacheMap[key].progress : 1))
-        .reduce((acc, cur) => acc + (cur/totalPages), 0);
+export const getIssueDownloadProgress = (resourceName, resourceType, totalPages, fileCacheMap, canceledIssues) =>
+    canceledIssues.findIndex(i => i.resourceName === resourceName && i.resourceType === resourceType) !== -1
+        ? 0
+        : Object.keys(fileCacheMap)
+            .filter(key => key.includes(resourceType === RESOURCE_TYPE.PREVIEW_IMG 
+                ? getPreviewImagePrefix(resourceName) 
+                : getIssueImagePrefix(resourceName)))
+            .filter(key => fileCacheMap[key].status === FILE_RETRIEVAL_STATUS.IN_PROGRESS || fileCacheMap[key].status === FILE_RETRIEVAL_STATUS.COMPLETED)
+            .map(key => (!!fileCacheMap[key].progress ? fileCacheMap[key].progress : 1))
+            .reduce((acc, cur) => acc + (cur/totalPages), 0);
 
-export const getIssuePreviewDownloadProgress = (resourceName, fileCacheMap) =>
-    getIssueDownloadProgress(resourceName, RESOURCE_TYPE.PREVIEW_IMG, NUMBER_OF_PREVIEW_PAGES, fileCacheMap);
+export const getIssuePreviewDownloadProgress = (resourceName, fileCacheMap, canceledIssues) =>
+    getIssueDownloadProgress(resourceName, RESOURCE_TYPE.PREVIEW_IMG, NUMBER_OF_PREVIEW_PAGES, fileCacheMap, canceledIssues);
 
-export const getIssueDownloadStatus = (resourceName, resourceType, totalPages, fileCacheMap) => {
+export const getIssueDownloadStatus = (resourceName, resourceType, totalPages, fileCacheMap, canceledIssues) => {
+    if (canceledIssues.findIndex(i => i.resourceName === resourceName && i.resourceType === resourceType) !== -1) {
+        return FILE_RETRIEVAL_STATUS.NOT_STARTED;
+    }
     let existingCacheKeys = Object.keys(fileCacheMap)
         .filter(key => key.includes(resourceType === RESOURCE_TYPE.PREVIEW_IMG 
             ? getPreviewImagePrefix(resourceName) 
@@ -49,8 +54,8 @@ export const getIssueDownloadStatus = (resourceName, resourceType, totalPages, f
     return FILE_RETRIEVAL_STATUS.NOT_STARTED; //Failsafe. This should never happen
 }
 
-export const getIssuePreviewDownloadStatus = (resourceName, fileCacheMap) =>
-    getIssueDownloadStatus(resourceName, RESOURCE_TYPE.PREVIEW_IMG, NUMBER_OF_PREVIEW_PAGES, fileCacheMap);
+export const getIssuePreviewDownloadStatus = (resourceName, fileCacheMap, canceledIssues) =>
+    getIssueDownloadStatus(resourceName, RESOURCE_TYPE.PREVIEW_IMG, NUMBER_OF_PREVIEW_PAGES, fileCacheMap, canceledIssues);
 
 export const getIssuePageNumberFromFilename = (localPath) => {
     const regex = /[\/a-zA-Z0-9-]+_issue-([0-9]+)\.[a-zA-Z]{3}/gm;

@@ -31,6 +31,7 @@ import {
 } from '../util/issueRetrievalUtil';
 
 const IssueListItem = ({ 
+    canceledIssues,
     controlAccordion, 
     downloaded, 
     fileCacheMap, 
@@ -76,7 +77,7 @@ const IssueListItem = ({
 
     let resourceName = issue.upload_timestamp;
     let totalPages = issue.total_pages;
-    let issueDownloadStatus = getIssueDownloadStatus(resourceName, RESOURCE_TYPE.ISSUE_IMG, totalPages, fileCacheMap);
+    let issueDownloadStatus = getIssueDownloadStatus(resourceName, RESOURCE_TYPE.ISSUE_IMG, totalPages, fileCacheMap, canceledIssues);
 
     return <View style={styles.issueListItemContainer}>
         <TouchableOpacity style={styles.issueListItem} onPress={toggleAccordion}>
@@ -116,11 +117,22 @@ const IssueListItem = ({
                             />
                         </View>
                     }
-                    { !!owned && (issueDownloadStatus === FILE_RETRIEVAL_STATUS.NOT_STARTED || issueDownloadStatus === FILE_RETRIEVAL_STATUS.FAILED) && 
+                    { !!owned && (issueDownloadStatus === FILE_RETRIEVAL_STATUS.NOT_STARTED) && 
                         <View style={styles.actionButton}>
                             <Button 
                                 color={styleConstants.button.color}
                                 title={"Download Issue"}
+                                onPress={() => {
+                                    getIssue(issue.upload_timestamp, issue.total_pages);
+                                }}
+                            />
+                        </View>
+                    }
+                    { !!owned && (issueDownloadStatus === FILE_RETRIEVAL_STATUS.FAILED) && 
+                        <View style={styles.actionButton}>
+                            <Button 
+                                color={styleConstants.button.color}
+                                title={"Failed - Retry?"}
                                 onPress={() => {
                                     getIssue(issue.upload_timestamp, issue.total_pages);
                                 }}
@@ -141,7 +153,7 @@ const IssueListItem = ({
                         <View style={styles.actionButton}>
                             <Button 
                                 color={styleConstants.button.color}
-                                title={"Downloading (" + Math.floor(getIssueDownloadProgress(resourceName, RESOURCE_TYPE.ISSUE_IMG, totalPages, fileCacheMap)*100) + "%)"}
+                                title={"Downloading (" + Math.floor(getIssueDownloadProgress(resourceName, RESOURCE_TYPE.ISSUE_IMG, totalPages, fileCacheMap, canceledIssues)*100) + "%)"}
                                 onPress={() => {
                                     selectIssue(issue.product_id);
                                     navigation.navigate('ViewIssue');
@@ -355,6 +367,7 @@ IssueListItem.defaultProps = {
 }
 
 const mapStateToProps = (state) => ({
+    canceledIssues: state.canceledIssues,
     fileCacheMap: state.fileCacheMap
 });
 

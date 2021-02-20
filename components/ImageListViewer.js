@@ -17,6 +17,8 @@ import { connect } from 'react-redux';
 import { HERO_IMAGE_RATIO, ORIENTATIONS, RESOURCE_TYPE } from '../constants';
 import { styleConstants } from '../constants/styles';
 import {
+    getIssueFilenames,
+    getIssuePreviewFilenames,
     getIssuePageNumberFromFilename,
     getPreviewPageNumberFromFilename
 } from '../util/issueRetrievalUtil';
@@ -25,12 +27,13 @@ const window = Dimensions.get("window");
 const MAX_ZOOM_FACTOR = 1.5;
 const SCROLL_WAIT_DURATION = 300;
 
-const ImageListViewer = ({ filenames, goBack, orientation, resourceType }) => {
+const ImageListViewer = ({ fileCacheMap, goBack, orientation, resourceName, resourceType }) => {
 
     const [aspectInverse, setAspectInverse] = React.useState(false);
     const [menuOpen, setMenuOpen] = React.useState(false);
     const [selectedPage, setSelectedPage] = React.useState(0);
     const [flatListRef, setFlatListRef] = React.useState();
+    const [filenames, setFilenames] = React.useState();
 
     const detectAndSetOrientation = () => {
         if ((orientation === ORIENTATIONS.PORTRAIT && window.height < window.width) 
@@ -48,6 +51,14 @@ const ImageListViewer = ({ filenames, goBack, orientation, resourceType }) => {
     React.useEffect(() => {
         detectAndSetOrientation();
     }, [orientation]);
+
+    React.useEffect(() => {
+        if (resourceType === RESOURCE_TYPE.PREVIEW_IMG) {
+            setFilenames(getIssueFilenames(resourceName, fileCacheMap));
+        } else {
+            setFilenames(getIssuePreviewFilenames(resourceName, fileCacheMap));
+        }
+    }, [resourceName, resourceType, fileCacheMap]);
 
     let imageViewStyle, height, width;
 
@@ -76,6 +87,10 @@ const ImageListViewer = ({ filenames, goBack, orientation, resourceType }) => {
             width: width,
             height: height
         };
+    }
+
+    if (!!filenames) {
+        return null;
     }
 
     return <View style={styles.container}>       
@@ -275,6 +290,7 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => ({
+    fileCacheMap: state.fileCacheMap,
     orientation: state.orientation
 });
 

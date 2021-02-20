@@ -3,7 +3,9 @@ import { ProgressView } from "@react-native-community/progress-view";
 import { connect } from 'react-redux';
 import { ActivityIndicator, Button, StyleSheet, Text, View } from 'react-native';
 import {
-    cancelIssueDownload as cancelIssueDownloadAction
+    cancelIssueDownload as cancelIssueDownloadAction,
+    cancelIssuePreviewDownload as cancelIssuePreviewDownloadAction,
+    getIssuePreview as getIssuePreviewAction
 } from '../actions/issueRetrievalActions';
 import {
     getIssueDownloadProgress,
@@ -17,35 +19,79 @@ import LogoTitle from './LogoTitle';
 import ImageListViewer from './ImageListViewer';
 
 const ViewIssue = ({
+    canceledIssues,
     cancelIssueDownload,
+    cancelIssuePreviewDownload,
     fileCacheMap, 
+    getIssuePreview,
     navigation,
-    resetSelectedIssue, 
+    resetSelectedIssue,
+    resourceType, 
     selectedIssue
 }) => {
 
-    const goBack = () => navigation && navigation.navigate && navigation.navigate('RootTabNavigator');
+    const [issueDownloadStatus, setIssueDownloadStatus] = React.useState();
+    const [issueDownloadProgress, setIssueDownloadProgress] = React.useState(0);
+
+    React.useEffect(() => {
+        const updateStatusAndProgress = async () => {
+            if (!!selectedIssue) {
+                let resourceName = selectedIssue.upload_timestamp;
+                let totalPages = selectedIssue.total_pages;
+                let downloadStatusResult = await getIssueDownloadStatus(resourceName, resourceType, totalPages, fileCacheMap, canceledIssues);
+                if (downloadStatusResult === FILE_RETRIEVAL_STATUS.NOT_STARTED) {
+                    getIssuePreview(resourceName);
+                } else if (downloadStatusResult === FILE_RETRIEVAL_STATUS.IN_PROGRESS) {
+                    setIssueDownloadProgress(await getIssueDownloadProgress(resourceName, resourceType, totalPages, fileCacheMap, canceledIssues));
+                    setIssueDownloadStatus(downloadStatusResult);
+                } else {
+                    setIssueDownloadStatus(downloadStatusResult);    
+                }
+            }
+        };
+        updateStatusAndProgress();
+    }, [selectedIssue, fileCacheMap, canceledIssues]);
+
+    const MiddleSpinner = () => 
+        <View style={styles.container}>
+            <View style={styles.requested}>
+                <View style={styles.logoTitle}>
+                    <LogoTitle style={styles.logoTitleImage} />
+                </View>
+                <ActivityIndicator size={"large"} color={styles.activityIndicator.color} style={styles.requestedActivityIndicator} />
+            </View>
+        </View>;
+
+    const goBack = () => {
+        navigation && navigation.navigate && navigation.navigate('RootTabNavigator');
+    }
 
     if (!selectedIssue || !fileCacheMap) {
         goBack();
-        return null;
+        // resetSelectedIssue();
+        return <MiddleSpinner />
     }
 
     let resourceName = selectedIssue.upload_timestamp;
-    let resourceType = RESOURCE_TYPE.ISSUE_IMG;
     let totalPages = selectedIssue.total_pages;
-    let issueDownloadStatus = getIssueDownloadStatus(resourceName, resourceType, totalPages, fileCacheMap);
 
-    if (issueDownloadStatus === FILE_RETRIEVAL_STATUS.NOT_STARTED) {
+    if (issueDownloadStatus === FILE_RETRIEVAL_STATUS.NOT_STARTED 
+        || canceledIssues.findIndex(i => i.resourceName === resourceName && i.resourceType === resourceType) !== -1) {
         goBack();
-        return null;
+        // resetSelectedIssue();
+        return <MiddleSpinner />;
     }
+
+    const handleCancelIssueDownloadClick = () => 
+        resourceType === RESOURCE_TYPE.PREVIEW_IMG
+            ? cancelIssuePreviewDownload(resourceName, fileCacheMap)
+            : cancelIssueDownload(resourceName, totalPages, fileCacheMap);
 
     return <View style={styles.container}>
         { issueDownloadStatus === FILE_RETRIEVAL_STATUS.COMPLETED &&
             <ImageListViewer
-                filenames={getIssueFilenames(resourceName, fileCacheMap)}
                 goBack={goBack}
+                resourceName={resourceName}
                 resourceType={RESOURCE_TYPE.ISSUE_IMG} />
         }
         { issueDownloadStatus === FILE_RETRIEVAL_STATUS.REQUESTED &&
@@ -63,19 +109,16 @@ const ViewIssue = ({
                 </View>
                 <Text style={styles.issueTitle}>{ selectedIssue.display_date + " - " + selectedIssue.issue_name }</Text>
                 <View style={styles.progressInfo}>
-                    <Text style={styles.inProgressText}>Downloading ({Math.floor(getIssueDownloadProgress(resourceName, resourceType, totalPages, fileCacheMap)*100)}%)...</Text>
+                    <Text style={styles.inProgressText}>Downloading ({Math.floor(issueDownloadProgress*100)}%)...</Text>
                     <ProgressView
                         progressTintColor={styles.progressTintColor.color}
                         trackTintColor={styles.trackTintColor.color}
-                        progress={getIssueDownloadProgress(resourceName, resourceType, totalPages, fileCacheMap)}
+                        progress={issueDownloadProgress}
                     />
                 </View>
                 <Button
                     color={styleConstants.actionButton.color}
-                    onPress={async () => {
-                        await cancelIssueDownload(resourceName, totalPages, fileCacheMap);
-                        resetSelectedIssue();
-                    }}
+                    onPress={handleCancelIssueDownloadClick}
                     style={styles.cancelDownloadButton}
                     title={"Cancel download"}
                 />
@@ -92,10 +135,7 @@ const ViewIssue = ({
                 <Text style={styles.errorText}>There was a problem fetching the file.</Text>
                 <Button
                     color={styleConstants.passiveButton.color}
-                    onPress={() => {
-                        await cancelIssueDownload(resourceName, totalPages, fileCacheMap);
-                        resetSelectedIssue();
-                    }}
+                    onPress={handleCancelIssueDownloadClick}
                     style={styles.goBackButton}
                     title={"Go Back"}
                 />
@@ -187,6 +227,7 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = state => ({
+    canceledIssues: state.canceledIssues,
     fileCacheMap: state.fileCacheMap,
     selectedIssue: state.selectedIssue
 });
@@ -194,6 +235,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     cancelIssueDownload: (resourceName, totalPages, fileCacheMap) => 
         dispatch(cancelIssueDownloadAction(resourceName, totalPages, fileCacheMap)),
+    cancelIssuePreviewDownload: (resourceName, fileCacheMap) => dispatch(cancelIssuePreviewDownloadAction(resourceName, fileCacheMap)),
+    getIssuePreview: (resourceName) => dispatch(getIssuePreviewAction(resourceName)),
     resetSelectedIssue: () => dispatch({ type: "SELECT_ISSUE", payload: {} })
 });
 

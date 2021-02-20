@@ -24,6 +24,11 @@ const failFileCache = (err, dispatch, filename) => {
     dispatch({ type: "FAIL_FILE_CACHE", payload: { filename }});
 }
 
+const removeFileCache = (err, dispatch, filename) => {
+    // console.error("Error fetching resource", JSON.stringify(err));
+    dispatch({ type: "REMOVE_FILE_CACHE", payload: { filename }});
+}
+
 const getFilePath = (filename) => (RNFetchBlob.fs.dirs.DocumentDir + "/" + filename);
 
 const fetchResource = (dispatch, filename, url) => {
@@ -49,7 +54,7 @@ const fetchResource = (dispatch, filename, url) => {
                 localPath: resourceResponse.path()
             }
         });
-    }).catch(err => failFileCache(err, dispatch, filename));    
+    }).catch(err => removeFileCache(err, dispatch, filename));    
 }
 
 export const cancelGetResource = (filename, task) => async dispatch => {

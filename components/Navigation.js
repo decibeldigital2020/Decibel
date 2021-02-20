@@ -3,7 +3,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import IssueList from './IssueList';
-import PreviewIssue from './PreviewIssue';
 import ViewIssue from './ViewIssue';
 import { styleConstants } from '../constants/styles';
 import Icon from 'react-native-ionicons';
@@ -11,11 +10,14 @@ import Help from './Help';
 import LogoTitle from './LogoTitle';
 import Subscriptions from './Subscriptions';
 import { connect } from 'react-redux';
+import { RESOURCE_TYPE } from '../constants';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Downloads = props => <IssueList downloadsOnly={true} {...props} />;
 const OwnedIssues = props => <IssueList ownedOnly={true} {...props} />;
+const PreviewIssue = props => <ViewIssue resourceType={RESOURCE_TYPE.PREVIEW_IMG} {...props} />;
+const ViewFullIssue = props => <ViewIssue resourceType={RESOURCE_TYPE.ISSUE_IMG} {...props} />;
 
 const screenOptions = {
   headerStyle: { backgroundColor: styleConstants.statusBar.backgroundColor },
@@ -195,7 +197,7 @@ const Navigation = ({currentVersion, clearCache, setVersion, version}) => {
           }} />
         <Stack.Screen 
           name="ViewIssue" 
-          component={ViewIssue}
+          component={ViewFullIssue}
           options={{
             title: "View Issue",
             headerShown: false

@@ -8,6 +8,12 @@ const initialState = {
     availableSubscriptions: [
         // IAP.Product
     ],
+    canceledIssues: [
+        // {
+        //     resourceName,
+        //     resourceType
+        // }
+    ],
     cancelQueue: [
         // {
         //     resourceName,
@@ -92,6 +98,7 @@ const reducer = (state = initialState, action) => {
                 status: FILE_RETRIEVAL_STATUS.COMPLETED,
                 localPath: action.payload.localPath
             }
+            // console.log("completing file cache", newState.fileCacheMap);
             return newState;
         }
         case "COMPLETE_FILE_LINK": {
@@ -113,6 +120,13 @@ const reducer = (state = initialState, action) => {
                 newCancelQueue.splice(index, 1);
             }
             newState.cancelQueue = newCancelQueue;
+            let newDownloadQueue = [...newState.downloadQueue];
+            newState.downloadQueue = newDownloadQueue.filter(q =>
+                q.resourceName !== action.payload.resourceName
+                || q.resourceType !== action.payload.resourceType);
+            let newCanceledIssues = [...newState.canceledIssues];
+            newCanceledIssues.push(action.payload);
+            newState.canceledIssues = newCanceledIssues;
             return newState;
         }
         case "CANCEL_QUEUE_PUSH": {
@@ -247,6 +261,15 @@ const reducer = (state = initialState, action) => {
             } else {
                 newState.selectedIssue = null;
             }
+            return newState;
+        }
+        case "UNCANCEL_ISSUE": {
+            let newCanceledIssues = [...newState.canceledIssues];
+            let index = newCanceledIssues.findIndex(i => i.resourceName === action.payload.resourceName && i.resourceType === action.payload.resourceType);
+            if (index !== -1) {
+                newCanceledIssues.splice(index, 1);
+            }
+            newState.canceledIssues = newCanceledIssues;
             return newState;
         }
         case "VERSION": {
