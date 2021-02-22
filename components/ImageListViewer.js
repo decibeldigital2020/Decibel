@@ -27,7 +27,7 @@ const window = Dimensions.get("window");
 const MAX_ZOOM_FACTOR = 1.5;
 const SCROLL_WAIT_DURATION = 300;
 
-const ImageListViewer = ({ fileCacheMap, goBack, orientation, resourceName, resourceType }) => {
+const ImageListViewer = ({ fileCacheMap, navigation, orientation, resourceName, resourceType }) => {
 
     const [aspectInverse, setAspectInverse] = React.useState(false);
     const [menuOpen, setMenuOpen] = React.useState(false);
@@ -54,9 +54,9 @@ const ImageListViewer = ({ fileCacheMap, goBack, orientation, resourceName, reso
 
     React.useEffect(() => {
         if (resourceType === RESOURCE_TYPE.PREVIEW_IMG) {
-            setFilenames(getIssueFilenames(resourceName, fileCacheMap));
-        } else {
             setFilenames(getIssuePreviewFilenames(resourceName, fileCacheMap));
+        } else {
+            setFilenames(getIssueFilenames(resourceName, fileCacheMap));
         }
     }, [resourceName, resourceType, fileCacheMap]);
 
@@ -89,8 +89,12 @@ const ImageListViewer = ({ fileCacheMap, goBack, orientation, resourceName, reso
         };
     }
 
-    if (!!filenames) {
+    if (!filenames) {
         return null;
+    }
+
+    const goBack = () => {
+        navigation && navigation.navigate && navigation.navigate('RootTabNavigator');
     }
 
     return <View style={styles.container}>       
@@ -186,7 +190,7 @@ const ImageListViewer = ({ fileCacheMap, goBack, orientation, resourceName, reso
                             color={styleConstants.button.color}
                             title={"Back To Issue List"}
                             onPress={() => {
-                                goBack && goBack();
+                                goBack();
                             }} 
                         />
                     </View>

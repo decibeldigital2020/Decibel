@@ -53,6 +53,31 @@ const IssueListItem = ({
     const [bodySectionHeight, setBodySectionHeight] = React.useState(0);
     const animatedController = React.useRef(new Animated.Value(controlAccordion ? 1 : 0)).current;
     const [deleteConfirmationModalOpen, setDeleteConfirmationModalOpen] = React.useState(false);
+    const [issueDownloadStatus, setIssueDownloadStatus] = React.useState(FILE_RETRIEVAL_STATUS.NOT_STARTED);
+    const [issueDownloadProgress, setIssueDownloadProgress] = React.useState(0);
+
+    React.useEffect(() => {
+        const updateStatusAndProgress = async () => {
+            let downloadStatusResult = await getIssueDownloadStatus(issue.upload_timestamp, RESOURCE_TYPE.ISSUE_IMG, issue.total_pages, fileCacheMap, canceledIssues);
+            // if (downloadStatusResult === FILE_RETRIEVAL_STATUS.IN_PROGRESS) {
+            //     console.log("setting issue download progress in IssueListItem");
+            //     let downloadProgressResult = await getIssueDownloadProgress(resourceName, RESOURCE_TYPE.ISSUE_IMG, totalPages, fileCacheMap, canceledIssues)
+            //     console.log("progress " + downloadProgressResult);
+            //     if (issueDownloadProgress !== downloadProgressResult) {
+            //         setIssueDownloadProgress(downloadProgressResult);
+            //     }
+            // }
+            if (issueDownloadStatus !== downloadStatusResult) {
+                console.log(`setting issue download status in IssueListItem: ${downloadStatusResult}`);
+                setIssueDownloadStatus(downloadStatusResult);    
+            }
+
+            // let thisIssueIsCanceled = canceledIssues.findIndex(i => i.resourceName === issue.upload_timestamp && i.resourceType === RESOURCE_TYPE.ISSUE_IMG) !== -1;
+            // let thisIssueIsInCache = Object.keys(fileCacheMap).filter(key => key.includes(issue.upload_timestamp) && !key.includes('hero')).length > 0;
+            
+        };
+        updateStatusAndProgress();
+    }, [fileCacheMap, canceledIssues]);
 
     const accordionHeight = animatedController.interpolate({
         inputRange: [0, 1],
@@ -75,9 +100,17 @@ const IssueListItem = ({
         setAccordionOpen(newValue);
     };
 
+    const goToIssue = ({resourceType = null}) => {
+        selectIssue(issue.product_id);
+        navigation 
+            && navigation.navigate 
+            && navigation.navigate(resourceType === RESOURCE_TYPE.PREVIEW_IMG 
+                ? 'PreviewIssue'
+                : 'ViewIssue');
+    };
+
     let resourceName = issue.upload_timestamp;
     let totalPages = issue.total_pages;
-    let issueDownloadStatus = getIssueDownloadStatus(resourceName, RESOURCE_TYPE.ISSUE_IMG, totalPages, fileCacheMap, canceledIssues);
 
     return <View style={styles.issueListItemContainer}>
         <TouchableOpacity style={styles.issueListItem} onPress={toggleAccordion}>
@@ -153,11 +186,8 @@ const IssueListItem = ({
                         <View style={styles.actionButton}>
                             <Button 
                                 color={styleConstants.button.color}
-                                title={"Downloading (" + Math.floor(getIssueDownloadProgress(resourceName, RESOURCE_TYPE.ISSUE_IMG, totalPages, fileCacheMap, canceledIssues)*100) + "%)"}
-                                onPress={() => {
-                                    selectIssue(issue.product_id);
-                                    navigation.navigate('ViewIssue');
-                                }}
+                                title={"Downloading..."/*(" + Math.floor(issueDownloadProgress*100) + "%)"*/}
+                                onPress={goToIssue}
                             />
                         </View>
                     }
@@ -166,10 +196,7 @@ const IssueListItem = ({
                             <Button 
                                 color={styleConstants.button.color}
                                 title={"View Issue"}
-                                onPress={() => {
-                                    selectIssue(issue.product_id);
-                                    navigation.navigate('ViewIssue');
-                                }}
+                                onPress={goToIssue}
                             />
                         </View>
                     }
@@ -178,10 +205,7 @@ const IssueListItem = ({
                             <Button 
                                 color={styleConstants.button.color}
                                 title={"Preview Issue"}
-                                onPress={() => {
-                                    selectIssue(issue.product_id);
-                                    navigation.navigate('PreviewIssue');
-                                }}
+                                onPress={() => goToIssue({ resourceType: RESOURCE_TYPE.PREVIEW_IMG })}
                             />
                         </View>
                     }

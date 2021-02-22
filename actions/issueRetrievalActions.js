@@ -32,6 +32,7 @@ export const getIssue = (resourceName, totalPages) => dispatch => {
 }
 
 export const getIssuePreview = (resourceName) => dispatch => {
+    console.log("get issue preview");
     dispatch({
         type: "UNCANCEL_ISSUE",
         payload: {
@@ -51,28 +52,30 @@ export const getIssuePreview = (resourceName) => dispatch => {
     }
 }
 
-export const cancelIssueDownload = (resourceName, totalPages, fileCacheMap, resourceType) => async dispatch => {
-    for (let i = 0; i < totalPages; i++) {
-        let filename = resourceType === RESOURCE_TYPE.PREVIEW_IMG 
-            ? getPreviewImageFilename(resourceName, i) 
-            : getIssueImageFilename(resourceName, i);
-        let entry = fileCacheMap[filename];
-        if (entry && entry.task) {
-            await dispatch(cancelGetResource(filename, entry.task));
+export const cancelIssueDownload = (resourceName, totalPages, resourceType) => 
+    async (dispatch, getState) => {
+        let fileCacheMap = getState().fileCacheMap;
+        for (let i = 0; i < totalPages; i++) {
+            let filename = resourceType === RESOURCE_TYPE.PREVIEW_IMG 
+                ? getPreviewImageFilename(resourceName, i) 
+                : getIssueImageFilename(resourceName, i);
+            let entry = fileCacheMap[filename];
+            if (entry && entry.task) {
+                await dispatch(cancelGetResource(filename, entry.task));
+            }
         }
-    }
-    await dispatch({
-        type: "CANCEL_QUEUE_PUSH",
-        payload: {
-            resourceName,
-            resourceType: RESOURCE_TYPE.ISSUE_IMG
-        }
-    });
+        await dispatch({
+            type: "CANCEL_QUEUE_PUSH",
+            payload: {
+                resourceName,
+                resourceType: resourceType || RESOURCE_TYPE.ISSUE_IMG
+            }
+        });
     // return Promise.resolve();
-}
+    };
 
-export const cancelIssuePreviewDownload = (resourceName, fileCacheMap) => async dispatch => {
-    return await cancelIssueDownload(resourceName, NUMBER_OF_PREVIEW_PAGES, fileCacheMap, RESOURCE_TYPE.PREVIEW_IMG);
+export const cancelIssuePreviewDownload = (resourceName) => async dispatch => {
+    return await cancelIssueDownload(resourceName, NUMBER_OF_PREVIEW_PAGES, RESOURCE_TYPE.PREVIEW_IMG);
 }
 
 export const removeIssue = (resourceName, totalPages) => (dispatch, getState) => {

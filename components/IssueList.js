@@ -50,7 +50,7 @@ const IssueList = ({
         if ((!issueList || !issueListIsAlive(issueListRequestedTimestamp)) && !requestingIssueList) {
             getIssueList();
         }
-    }, []);
+    }, []);//TODO investigate if refreshing periodically for new issues
 
     React.useEffect(() => {
         if (!!availableProducts && availableProducts.length > 0) {
@@ -104,7 +104,14 @@ const IssueList = ({
                     refreshing={requestingIssueList}
                     renderItem={(issue) => 
                         <IssueListItem 
-                            controlAccordion={!downloadsOnly && !ownedOnly && issueList.issues.length > 2 && [0, 1, 2].map(i => issueList.issues[i].product_id).includes(issue.item.product_id)}
+                            controlAccordion={
+                                !downloadsOnly 
+                                && !ownedOnly 
+                                && issueList.issues.length > 2 
+                                && [0, 1, 2]
+                                    .map(i => issueList.issues[i].product_id)
+                                    .includes(issue.item.product_id)
+                            }
                             downloaded={!!downloadsOnly}
                             issue={issue.item} 
                             navigation={navigation} 

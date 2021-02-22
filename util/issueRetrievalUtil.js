@@ -9,7 +9,9 @@ import {
 } from '../util/fileRetrievalUtil';
 
 export const getIssueDownloadProgress = (resourceName, resourceType, totalPages, fileCacheMap, canceledIssues) =>
-    canceledIssues.findIndex(i => i.resourceName === resourceName && i.resourceType === resourceType) !== -1
+    {
+    console.log("get issue download progress");
+    return canceledIssues.findIndex(i => i.resourceName === resourceName && i.resourceType === resourceType) !== -1
         ? 0
         : Object.keys(fileCacheMap)
             .filter(key => key.includes(resourceType === RESOURCE_TYPE.PREVIEW_IMG 
@@ -18,12 +20,15 @@ export const getIssueDownloadProgress = (resourceName, resourceType, totalPages,
             .filter(key => fileCacheMap[key].status === FILE_RETRIEVAL_STATUS.IN_PROGRESS || fileCacheMap[key].status === FILE_RETRIEVAL_STATUS.COMPLETED)
             .map(key => (!!fileCacheMap[key].progress ? fileCacheMap[key].progress : 1))
             .reduce((acc, cur) => acc + (cur/totalPages), 0);
+    }
 
 export const getIssuePreviewDownloadProgress = (resourceName, fileCacheMap, canceledIssues) =>
     getIssueDownloadProgress(resourceName, RESOURCE_TYPE.PREVIEW_IMG, NUMBER_OF_PREVIEW_PAGES, fileCacheMap, canceledIssues);
 
 export const getIssueDownloadStatus = (resourceName, resourceType, totalPages, fileCacheMap, canceledIssues) => {
+    console.log("get issue download status");
     if (canceledIssues.findIndex(i => i.resourceName === resourceName && i.resourceType === resourceType) !== -1) {
+        console.log("issue is cancelled");
         return FILE_RETRIEVAL_STATUS.NOT_STARTED;
     }
     let existingCacheKeys = Object.keys(fileCacheMap)
