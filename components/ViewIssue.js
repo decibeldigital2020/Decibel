@@ -17,6 +17,7 @@ import { styleConstants } from '../constants/styles';
 import ErrorHelperText from './ErrorHelperText';
 import LogoTitle from './LogoTitle';
 import ImageListViewer from './ImageListViewer';
+import { useIsMounted } from '../util/checkMountStatusUtil';
 
 const MiddleSpinner = () => 
     <View style={styles.container}>
@@ -47,7 +48,6 @@ const ViewIssue = ({
     }
 
     if (!selectedIssue || !fileCacheMap) {
-        goBack();
         return null;
     }
 
@@ -62,10 +62,18 @@ const ViewIssue = ({
 
     const [issueDownloadStatus, setIssueDownloadStatus] = React.useState();
     const [issueDownloadProgress, setIssueDownloadProgress] = React.useState(0);
+    const isMounted = useIsMounted();
+    const [isCanceled, setIsCanceled] = React.useState(false);
 
     React.useEffect(() => {
         const updateStatusAndProgress = async () => {
-            if (!!selectedIssue && !thisIssueIsCancelled(canceledIssues)) {
+            let cancelationInQueue = thisIssueIsCancelled(canceledIssues);
+            if (!selectedIssue || !fileCacheMap) {
+                goBack();
+            } else if (cancelationInQueue) {
+                setIsCanceled(true);
+                goBack();
+            } else if (!!selectedIssue && !isCanceled) {
                 let downloadStatusResult = await getIssueDownloadStatus(
                     selectedIssue.upload_timestamp, 
                     resourceType, 
@@ -83,24 +91,29 @@ const ViewIssue = ({
                         selectedIssue.total_pages, 
                         fileCacheMap, 
                         canceledIssues);
-                    console.log("progress " + downloadProgressResult);
-                    if (issueDownloadProgress !== downloadProgressResult) {
-                        setIssueDownloadProgress(downloadProgressResult);
+                    if (isMounted && issueDownloadProgress !== downloadProgressResult) {
+                        console.log("progress " + downloadProgressResult);
+                        setTimeout(() => {
+                            setIssueDownloadProgress(downloadProgressResult);  
+                        }, 0);
                     }
                 }
-                if (issueDownloadStatus !== downloadStatusResult) {
+                if (isMounted && issueDownloadStatus !== downloadStatusResult) {
                     console.log(`setting issue download status in IssueListItem: ${downloadStatusResult}`);
-                    setIssueDownloadStatus(downloadStatusResult);    
+                    setTimeout(() => {
+                        setIssueDownloadStatus(downloadStatusResult);    
+                    }, 0);
                 }
             }
         };
         updateStatusAndProgress();
+        return () => {};
     }, [selectedIssue, fileCacheMap, canceledIssues]);
 
     if (issueDownloadStatus === FILE_RETRIEVAL_STATUS.NOT_STARTED 
-        || thisIssueIsCancelled(canceledIssues)) {
+        || isCanceled || !isMounted) {
         console.log("detected cancellation");
-        goBack();
+        //goBack();
         return null;
     }
 

@@ -58,6 +58,9 @@ const IssueListItem = ({
 
     React.useEffect(() => {
         const updateStatusAndProgress = async () => {
+            if (!accordionOpen) {
+                return;
+            }
             let downloadStatusResult = await getIssueDownloadStatus(issue.upload_timestamp, RESOURCE_TYPE.ISSUE_IMG, issue.total_pages, fileCacheMap, canceledIssues);
             // if (downloadStatusResult === FILE_RETRIEVAL_STATUS.IN_PROGRESS) {
             //     console.log("setting issue download progress in IssueListItem");
