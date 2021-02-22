@@ -41,8 +41,6 @@ const ViewIssue = ({
     selectedIssue
 }) => {
 
-    resourceType = resourceType || RESOURCE_TYPE.ISSUE_IMG;
-
     const goBack = () => {
         navigation && navigation.navigate && navigation.navigate('RootTabNavigator');
     }
@@ -63,17 +61,17 @@ const ViewIssue = ({
     const [issueDownloadStatus, setIssueDownloadStatus] = React.useState();
     const [issueDownloadProgress, setIssueDownloadProgress] = React.useState(0);
     const isMounted = useIsMounted();
-    const [isCanceled, setIsCanceled] = React.useState(false);
+    const [hasGoneBack, setHasGoneBack] = React.useState(false);
 
     React.useEffect(() => {
         const updateStatusAndProgress = async () => {
-            let cancelationInQueue = thisIssueIsCancelled(canceledIssues);
             if (!selectedIssue || !fileCacheMap) {
                 goBack();
-            } else if (cancelationInQueue) {
-                setIsCanceled(true);
+            } else if (thisIssueIsCancelled(canceledIssues) && !hasGoneBack) {
+                console.log("canceled. go back", canceledIssues, navigation);
+                setHasGoneBack(true);
                 goBack();
-            } else if (!!selectedIssue && !isCanceled) {
+            } else if (!!selectedIssue) {
                 let downloadStatusResult = await getIssueDownloadStatus(
                     selectedIssue.upload_timestamp, 
                     resourceType, 
@@ -111,7 +109,7 @@ const ViewIssue = ({
     }, [selectedIssue, fileCacheMap, canceledIssues]);
 
     if (issueDownloadStatus === FILE_RETRIEVAL_STATUS.NOT_STARTED 
-        || isCanceled || !isMounted) {
+        || !isMounted || hasGoneBack) {
         console.log("detected cancellation");
         //goBack();
         return null;

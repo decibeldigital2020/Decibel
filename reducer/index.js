@@ -151,6 +151,14 @@ const reducer = (state = initialState, action) => {
             let newDownloadQueue = [...newState.downloadQueue];
             newDownloadQueue.push(action.payload);
             newState.downloadQueue = newDownloadQueue;
+            let newCanceledIssues = [newState.canceledIssues];
+            let index = newCanceledIssues.findIndex(q =>
+                q.resourceName === action.payload.resourceName
+                && q.resourceType === action.payload.resourceType);
+            if (index !== -1) {
+                newCanceledIssues.splice(index, 1);
+            }
+            newState.canceledIssues = newCanceledIssues;
             return newState;
         }
         case "FAIL_FILE_CACHE": {

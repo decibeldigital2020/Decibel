@@ -71,11 +71,11 @@ export const cancelIssueDownload = (resourceName, totalPages, resourceType) =>
                 resourceType: resourceType || RESOURCE_TYPE.ISSUE_IMG
             }
         });
-    // return Promise.resolve();
+        return Promise.resolve();
     };
 
 export const cancelIssuePreviewDownload = (resourceName) => async dispatch => {
-    return await cancelIssueDownload(resourceName, NUMBER_OF_PREVIEW_PAGES, RESOURCE_TYPE.PREVIEW_IMG);
+    return await dispatch(cancelIssueDownload(resourceName, NUMBER_OF_PREVIEW_PAGES, RESOURCE_TYPE.PREVIEW_IMG));
 }
 
 export const removeIssue = (resourceName, totalPages) => (dispatch, getState) => {
