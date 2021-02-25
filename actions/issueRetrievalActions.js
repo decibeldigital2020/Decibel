@@ -24,16 +24,14 @@ export const getIssue = (issue, resourceType) => dispatch => {
             resourceType
         }
     });
-    for (let i = 0; i < totalPages; i++) {
-        dispatch({
-            type: "DOWNLOAD_QUEUE_PUSH",
-            payload: {
-                resourceName,
-                resourceType,
-                page: i
-            }
-        });
-    }
+    dispatch({
+        type: "DOWNLOAD_QUEUE_PUSH",
+        payload: {
+            resourceName,
+            resourceType,
+            pages: totalPages
+        }
+    });
 }
 
 export const cancelIssueDownload = (resourceName, totalPages, resourceType) => 
