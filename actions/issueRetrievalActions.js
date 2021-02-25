@@ -11,12 +11,17 @@ import {
     removeResource
 } from './fileRetrievalActions';
 
-export const getIssue = (resourceName, totalPages) => dispatch => {
+export const getIssue = (issue, resourceType) => dispatch => {
+    let resourceName = issue.upload_timestamp;
+    resourceType = resourceType || RESOURCE_TYPE.ISSUE_IMG;
+    let totalPages = resourceType === RESOURCE_TYPE.PREVIEW_IMG 
+        ? NUMBER_OF_PREVIEW_PAGES 
+        : issue.total_pages;
     dispatch({
         type: "UNCANCEL_ISSUE",
         payload: {
             resourceName,
-            resourceType: RESOURCE_TYPE.ISSUE_IMG
+            resourceType
         }
     });
     for (let i = 0; i < totalPages; i++) {
@@ -24,28 +29,7 @@ export const getIssue = (resourceName, totalPages) => dispatch => {
             type: "DOWNLOAD_QUEUE_PUSH",
             payload: {
                 resourceName,
-                resourceType: RESOURCE_TYPE.ISSUE_IMG,
-                page: i
-            }
-        });
-    }
-}
-
-export const getIssuePreview = (resourceName) => dispatch => {
-    console.log("get issue preview");
-    dispatch({
-        type: "UNCANCEL_ISSUE",
-        payload: {
-            resourceName,
-            resourceType: RESOURCE_TYPE.PREVIEW_IMG
-        }
-    });
-    for (let i = 0; i < NUMBER_OF_PREVIEW_PAGES; i++) {
-        dispatch({
-            type: "DOWNLOAD_QUEUE_PUSH",
-            payload: {
-                resourceName,
-                resourceType: RESOURCE_TYPE.PREVIEW_IMG,
+                resourceType,
                 page: i
             }
         });
@@ -55,13 +39,14 @@ export const getIssuePreview = (resourceName) => dispatch => {
 export const cancelIssueDownload = (resourceName, totalPages, resourceType) => 
     async (dispatch, getState) => {
         let fileCacheMap = getState().fileCacheMap;
+        totalPages = RESOURCE_TYPE.PREVIEW_IMG ? NUMBER_OF_PREVIEW_PAGES : totalPages;
         for (let i = 0; i < totalPages; i++) {
             let filename = resourceType === RESOURCE_TYPE.PREVIEW_IMG 
                 ? getPreviewImageFilename(resourceName, i) 
                 : getIssueImageFilename(resourceName, i);
             let entry = fileCacheMap[filename];
             if (entry && entry.task) {
-                await dispatch(cancelGetResource(filename, entry.task));
+                await dispatch(cancelGetResource(filename, entry.task, resourceName, resourceType));
             }
         }
         await dispatch({
@@ -73,10 +58,6 @@ export const cancelIssueDownload = (resourceName, totalPages, resourceType) =>
         });
         return Promise.resolve();
     };
-
-export const cancelIssuePreviewDownload = (resourceName) => async dispatch => {
-    return await dispatch(cancelIssueDownload(resourceName, NUMBER_OF_PREVIEW_PAGES, RESOURCE_TYPE.PREVIEW_IMG));
-}
 
 export const removeIssue = (resourceName, totalPages) => (dispatch, getState) => {
     // console.log("state", getState().issueList.issues.filter(issue => issue.upload_timestamp === resourceName).map(issue => issue.total_pages));
@@ -91,12 +72,12 @@ export const removeIssue = (resourceName, totalPages) => (dispatch, getState) =>
         }
     }
     for (let i = 0; i < totalPages; i++) {
-        dispatch(removeResource(getIssueImageFilename(resourceName, i)));
+        dispatch(removeResource(getIssueImageFilename(resourceName, i), resourceName, RESOURCE_TYPE.ISSUE_IMG));
     }
 }
 
 export const removeIssuePreview = (resourceName) => dispatch => {
     for (let i = 0; i < NUMBER_OF_PREVIEW_PAGES; i++) {
-        dispatch(removeResource(getPreviewImageFilename(resourceName, i)));
+        dispatch(removeResource(getPreviewImageFilename(resourceName, i), resourceName, RESOURCE_TYPE.PREVIEW_IMG));
     }
 }

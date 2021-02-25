@@ -19,30 +19,32 @@ const headers = {
 
 const PROGRESS_FACTOR = 2;
 
-const failFileCache = (err, dispatch, filename) => {
+const failFileCache = (err, dispatch, filename, resourceName, resourceType) => {
     // console.error("Error fetching resource", JSON.stringify(err));
-    dispatch({ type: "FAIL_FILE_CACHE", payload: { filename }});
+    dispatch({ type: "FAIL_FILE_CACHE", payload: { filename, resourceName, resourceType }});
 }
 
-const removeFileCache = (err, dispatch, filename) => {
+const removeFileCache = (err, dispatch, filename, resourceName, resourceType) => {
     // console.error("Error fetching resource", JSON.stringify(err));
-    dispatch({ type: "REMOVE_FILE_CACHE", payload: { filename }});
+    dispatch({ type: "REMOVE_FILE_CACHE", payload: { filename, resourceName, resourceType }});
 }
 
 const getFilePath = (filename) => (RNFetchBlob.fs.dirs.DocumentDir + "/" + filename);
 
-const fetchResource = (dispatch, filename, url) => {
+const fetchResource = (dispatch, filename, url, resourceName, resourceType) => {
     // console.log(`fetching ${filename} from ${url}`)
     let dirs = RNFetchBlob.fs.dirs;
     let task = RNFetchBlob.config({ path : getFilePath(filename) }).fetch('GET', url);
-    dispatch({ type: "REQUEST_FILE_CACHE", payload: { filename, task } });
+    dispatch({ type: "REQUEST_FILE_CACHE", payload: { filename, task, resourceName, resourceType } });
     return task.progress({ count : PROGRESS_FACTOR }, (received, total) => {
         // console.log('progress', received / total);
         dispatch({
             type: "IN_PROGRESS_FILE_CACHE",
             payload: {
                 filename,
-                progress: (received / total)
+                progress: (received / total),
+                resourceName, 
+                resourceType
             }
         });
     }).then((resourceResponse) => {
@@ -51,20 +53,22 @@ const fetchResource = (dispatch, filename, url) => {
             type: "COMPLETE_FILE_CACHE",
             payload: {
                 filename,
-                localPath: resourceResponse.path()
+                localPath: resourceResponse.path(),
+                resourceName, 
+                resourceType
             }
         });
-    }).catch(err => removeFileCache(err, dispatch, filename));    
+    }).catch(err => removeFileCache(err, dispatch, filename, resourceName, resourceType));    
 }
 
-export const cancelGetResource = (filename, task) => async dispatch => {
+export const cancelGetResource = (filename, task, resourceName, resourceType) => async dispatch => {
     return task && task.cancel && await task.cancel(async err => {
         if (err) {
             console.error("Error canceling task", filename, task, JSON.stringify(err));
         }
         await dispatch({
             type: "REMOVE_FILE_CACHE",
-            payload: { filename }
+            payload: { filename, resourceName, resourceType }
         });
         Promise.resolve();
     });
@@ -113,6 +117,7 @@ export const getResourceLink = (resourceName, resourceType, page) => dispatch =>
 }
 
 export const getResourceFromLink = (url) => dispatch => {
+    // Does not update progress during download
     let filename = getFilenameFromUrl(url);
     fetchResource(dispatch, filename, url);
 }
@@ -132,7 +137,7 @@ export const getResource = (resourceName, resourceType, page, receipt) => dispat
         data.receipt = receipt;
     }
     // console.log("Fetching resource " + ENDPOINT_RESOURCE_LAMBDA, data, filename);
-    dispatch({ type: "REQUEST_FILE_CACHE", payload: { filename } });
+    dispatch({ type: "REQUEST_FILE_CACHE", payload: { filename, resourceName, resourceType } });
     fetch(ENDPOINT_RESOURCE_LAMBDA, {
         body: JSON.stringify(data),
         headers,
@@ -155,8 +160,8 @@ export const getResource = (resourceName, resourceType, page, receipt) => dispat
             throw new Error(responseJson);
         }
         let url = responseJson.url;
-        fetchResource(dispatch, filename, url);
-    }).catch(err => failFileCache(err, dispatch, filename));
+        fetchResource(dispatch, filename, url, resourceName, resourceType);
+    }).catch(err => failFileCache(err, dispatch, filename, resourceName, resourceType));
 }
 
 export const invalidateActiveSubscription = () => dispatch => {
@@ -166,7 +171,7 @@ export const invalidateActiveSubscription = () => dispatch => {
     });
 }
 
-export const removeResource = (filename) => dispatch => {
+export const removeResource = (filename, resourceName, resourceType) => dispatch => {
     let filePath = getFilePath(filename);
     RNFetchBlob.fs.exists(filePath)
         .then(exist => 
@@ -174,7 +179,7 @@ export const removeResource = (filename) => dispatch => {
                 .then(() => {
                     dispatch({
                         type: "REMOVE_FILE_CACHE",
-                        payload: { filename }
+                        payload: { filename, resourceName, resourceType }
                     });
                 })
                 .catch(err => {

@@ -1,4 +1,8 @@
 import { FILE_RETRIEVAL_STATUS } from '../constants';
+import {
+    getIssueDownloadProgress,
+    getIssueDownloadStatus
+} from '../util/issueRetrievalUtil';
 
 const initialState = {
     activeSubscription: null, // IAP.Purchase
@@ -28,6 +32,14 @@ const initialState = {
         //     page
         // }
     ],
+    downloadProgressMap: {
+        /*
+         * resourceName:resourceType: {
+         *   status: oneOf: [canceled, requested, in_progress, completed, failed],
+         *   progress: 0 - 1
+         * }
+         */
+    },
     fileCacheMap: {
         /*
          * filename: {
@@ -63,6 +75,9 @@ const initialState = {
     selectedIssue: null // item from mocks.issueListResponse.issues
 };
 
+const getIssueKey = (action) => 
+    action.payload.resourceName + ":" + action.payload.resourceType;
+
 const reducer = (state = initialState, action) => {
     let newState = Object.assign({}, state);
     switch(action.type) {
@@ -97,6 +112,13 @@ const reducer = (state = initialState, action) => {
             newState.fileCacheMap[action.payload.filename] = {
                 status: FILE_RETRIEVAL_STATUS.COMPLETED,
                 localPath: action.payload.localPath
+            }
+            if (action.payload.resourceName && action.payload.resourceType) {
+                newState.downloadProgressMap = Object.assign({}, newState.downloadProgressMap);
+                newState.downloadProgressMap[getIssueKey(action)] = {
+                    status: getIssueDownloadStatus(newState, action),
+                    progress: getIssueDownloadProgress(newState, action)
+                }
             }
             // console.log("completing file cache", newState.fileCacheMap);
             return newState;
@@ -166,6 +188,11 @@ const reducer = (state = initialState, action) => {
             newState.fileCacheMap[action.payload.filename] = {
                 status: FILE_RETRIEVAL_STATUS.FAILED
             }
+            newState.downloadProgressMap = Object.assign({}, newState.downloadProgressMap);
+            newState.downloadProgressMap[getIssueKey(action)] = {
+                status: FILE_RETRIEVAL_STATUS.FAILED,
+                progress: 0
+            }
             return newState;
         }
         case "FAIL_FILE_LINK": {
@@ -184,6 +211,13 @@ const reducer = (state = initialState, action) => {
                 ...newCacheEntry,
                 status: FILE_RETRIEVAL_STATUS.IN_PROGRESS,
                 progress: action.payload.progress
+            }
+            if (action.payload.resourceName && action.payload.resourceType) {
+                newState.downloadProgressMap = Object.assign({}, newState.downloadProgressMap);
+                newState.downloadProgressMap[getIssueKey(action)] = {
+                    status: getIssueDownloadStatus(newState, action),
+                    progress: getIssueDownloadProgress(newState, action)
+                }
             }
             return newState;
         }
@@ -225,6 +259,8 @@ const reducer = (state = initialState, action) => {
         case "REMOVE_FILE_CACHE": {
             newState.fileCacheMap = Object.assign({}, newState.fileCacheMap);
             delete newState.fileCacheMap[action.payload.filename];
+            newState.downloadProgressMap = Object.assign({}, newState.downloadProgressMap);
+            delete newState.downloadProgressMap[getIssueKey(action)];
             return newState;
         }
         case "REMOVE_FILE_LINK": {
@@ -238,6 +274,13 @@ const reducer = (state = initialState, action) => {
                 status: FILE_RETRIEVAL_STATUS.REQUESTED,
                 task: action.payload.task
             };
+            if (action.payload.resourceName && action.payload.resourceType) {
+                newState.downloadProgressMap = Object.assign({}, newState.downloadProgressMap);
+                newState.downloadProgressMap[getIssueKey(action)] = {
+                    status: getIssueDownloadStatus(newState, action),
+                    progress: getIssueDownloadProgress(newState, action)
+                }
+            }
             return newState;
         }
         case "REQUEST_FILE_LINK": {

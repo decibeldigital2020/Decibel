@@ -22,7 +22,9 @@ import {
 } from '../constants/products';
 import { getAvailableSubscriptions as getAvailableSubscriptionsAction } from '../actions/iapActions';
 import RestorePurchasesButton from './RestorePurchasesButton';
-import { getIssueDownloadStatus } from '../util/issueRetrievalUtil';
+import { 
+    issueIsIncludedInDownloads 
+} from '../util/issueRetrievalUtil';
 
 const issueListIsAlive = issueListRequestedTimestamp => 
     (issueListRequestedTimestamp + MAX_ISSUE_LIST_AGE) >= Date.now();
@@ -33,6 +35,7 @@ const IssueList = ({
     availableSubscriptions,
     canceledIssues,
     downloadsOnly, 
+    downloadProgressMap,
     fileCacheMap,
     getAvailableSubscriptions,
     getIssueList, 
@@ -89,7 +92,7 @@ const IssueList = ({
 
     const data = !!downloadsOnly 
         ? issueList.issues.filter(issue => 
-            getIssueDownloadStatus(issue.upload_timestamp, RESOURCE_TYPE.ISSUE_IMG, issue.total_pages, fileCacheMap, canceledIssues) === FILE_RETRIEVAL_STATUS.COMPLETED)
+            issueIsIncludedInDownloads(issue.upload_timestamp, RESOURCE_TYPE.ISSUE_IMG, downloadProgressMap, canceledIssues))
         : (!!ownedOnly
             ? issueList.issues.filter(isIssueOwned)
             : issueList.issues);
@@ -185,6 +188,7 @@ const mapStateToProps = state => ({
     availableProducts: state.availableProducts,
     availableSubscriptions: state.availableSubscriptions,
     canceledIssues: state.canceledIssues,
+    downloadProgressMap: state.downloadProgressMap,
     fileCacheMap: state.fileCacheMap,
     issueList: state.issueList,
     issueListRequestedTimestamp: state.issueListRequestedTimestamp,

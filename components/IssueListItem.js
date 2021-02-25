@@ -24,16 +24,16 @@ import {
     getIssue as getIssueAction,
     removeIssue as removeIssueAction 
 } from '../actions/issueRetrievalActions';
-import { requestNewPurchase as requestNewPurchaseAction } from '../actions/iapActions';
-import { 
-    getIssueDownloadStatus,
-    getIssueDownloadProgress 
+import {
+    getStatusFromProgressMap
 } from '../util/issueRetrievalUtil';
+import { requestNewPurchase as requestNewPurchaseAction } from '../actions/iapActions';
 
 const IssueListItem = ({ 
     canceledIssues,
     controlAccordion, 
     downloaded, 
+    downloadProgressMap,
     fileCacheMap, 
     getIssue,
     issue, 
@@ -53,34 +53,10 @@ const IssueListItem = ({
     const [bodySectionHeight, setBodySectionHeight] = React.useState(0);
     const animatedController = React.useRef(new Animated.Value(controlAccordion ? 1 : 0)).current;
     const [deleteConfirmationModalOpen, setDeleteConfirmationModalOpen] = React.useState(false);
-    const [issueDownloadStatus, setIssueDownloadStatus] = React.useState(FILE_RETRIEVAL_STATUS.NOT_STARTED);
-    const [issueDownloadProgress, setIssueDownloadProgress] = React.useState(0);
 
-    React.useEffect(() => {
-        const updateStatusAndProgress = async () => {
-            if (!accordionOpen) {
-                return;
-            }
-            let downloadStatusResult = await getIssueDownloadStatus(issue.upload_timestamp, RESOURCE_TYPE.ISSUE_IMG, issue.total_pages, fileCacheMap, canceledIssues);
-            // if (downloadStatusResult === FILE_RETRIEVAL_STATUS.IN_PROGRESS) {
-            //     console.log("setting issue download progress in IssueListItem");
-            //     let downloadProgressResult = await getIssueDownloadProgress(resourceName, RESOURCE_TYPE.ISSUE_IMG, totalPages, fileCacheMap, canceledIssues)
-            //     console.log("progress " + downloadProgressResult);
-            //     if (issueDownloadProgress !== downloadProgressResult) {
-            //         setIssueDownloadProgress(downloadProgressResult);
-            //     }
-            // }
-            if (issueDownloadStatus !== downloadStatusResult) {
-                console.log(`setting issue download status in IssueListItem: ${downloadStatusResult}`);
-                setIssueDownloadStatus(downloadStatusResult);    
-            }
-
-            // let thisIssueIsCanceled = canceledIssues.findIndex(i => i.resourceName === issue.upload_timestamp && i.resourceType === RESOURCE_TYPE.ISSUE_IMG) !== -1;
-            // let thisIssueIsInCache = Object.keys(fileCacheMap).filter(key => key.includes(issue.upload_timestamp) && !key.includes('hero')).length > 0;
-            
-        };
-        updateStatusAndProgress();
-    }, [fileCacheMap, canceledIssues]);
+    const statusFromProgressMap = getStatusFromProgressMap(issue.upload_timestamp, RESOURCE_TYPE.ISSUE_IMG, downloadProgressMap);
+    const issueDownloadStatus = statusFromProgressMap.status;
+    const issueDownloadProgress = statusFromProgressMap.progress;
 
     const accordionHeight = animatedController.interpolate({
         inputRange: [0, 1],
@@ -159,7 +135,7 @@ const IssueListItem = ({
                                 color={styleConstants.button.color}
                                 title={"Download Issue"}
                                 onPress={() => {
-                                    getIssue(issue.upload_timestamp, issue.total_pages);
+                                    getIssue(issue);
                                 }}
                             />
                         </View>
@@ -170,7 +146,7 @@ const IssueListItem = ({
                                 color={styleConstants.button.color}
                                 title={"Failed - Retry?"}
                                 onPress={() => {
-                                    getIssue(issue.upload_timestamp, issue.total_pages);
+                                    getIssue(issue);
                                 }}
                             />
                         </View>
@@ -189,7 +165,7 @@ const IssueListItem = ({
                         <View style={styles.actionButton}>
                             <Button 
                                 color={styleConstants.button.color}
-                                title={"Downloading..."/*(" + Math.floor(issueDownloadProgress*100) + "%)"*/}
+                                title={"Downloading... (" + Math.floor(issueDownloadProgress*100) + "%)"}
                                 onPress={goToIssue}
                             />
                         </View>
@@ -208,7 +184,10 @@ const IssueListItem = ({
                             <Button 
                                 color={styleConstants.button.color}
                                 title={"Preview Issue"}
-                                onPress={() => goToIssue({ resourceType: RESOURCE_TYPE.PREVIEW_IMG })}
+                                onPress={() => {
+                                    getIssue(issue, RESOURCE_TYPE.PREVIEW_IMG);
+                                    goToIssue({ resourceType: RESOURCE_TYPE.PREVIEW_IMG });
+                                }}
                             />
                         </View>
                     }
@@ -395,11 +374,12 @@ IssueListItem.defaultProps = {
 
 const mapStateToProps = (state) => ({
     canceledIssues: state.canceledIssues,
+    downloadProgressMap: state.downloadProgressMap,
     fileCacheMap: state.fileCacheMap
 });
 
 const mapDispatchToProps = () => dispatch => ({
-    getIssue: (resourceName, totalPages) => dispatch(getIssueAction(resourceName, totalPages)),
+    getIssue: (issue, resourceType) => dispatch(getIssueAction(issue, resourceType)),
     removeIssue: (resourceName, totalPages) => dispatch(removeIssueAction(resourceName, totalPages)),
     requestNewPurchase: (sku) => dispatch(requestNewPurchaseAction(sku)),
     selectIssue: (productId) => dispatch({ type: "SELECT_ISSUE", payload: { productId }})
