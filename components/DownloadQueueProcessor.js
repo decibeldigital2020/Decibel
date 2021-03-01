@@ -51,13 +51,13 @@ const DownloadQueueProcessor = ({
         if (cancelQueue.length > 0) {
             let next = cancelQueue[0];
             if (next.resourceType === RESOURCE_TYPE.PREVIEW_IMG) {
-                console.log(`removing issue preview: ${next.resourceName}`);
+                // console.log(`removing issue preview: ${next.resourceName}`);
                 removeIssuePreview(next.resourceName);
             } else {
-                console.log(`removing issue: ${next.resourceName}`)
+                // console.log(`removing issue: ${next.resourceName}`)
                 removeIssue(next.resourceName);
             }
-            console.log(`popping from cancel queue`);
+            // console.log(`popping from cancel queue`);
             cancelQueuePop(next);
         } else if (getInProgressDownloadCount(fileCacheMap) < MAX_INFLIGHT_DOWNLOADS && downloadQueue.length > 0) {
             // More things are on the queue. Start downloading them.

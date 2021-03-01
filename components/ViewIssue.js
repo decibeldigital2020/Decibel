@@ -14,6 +14,7 @@ import { styleConstants } from '../constants/styles';
 import ErrorHelperText from './ErrorHelperText';
 import LogoTitle from './LogoTitle';
 import ImageListViewer from './ImageListViewer';
+import ImageListZoomViewer from './ImageListZoomViewer';
 
 const MiddleSpinner = () => 
     <View style={styles.container}>
@@ -76,7 +77,7 @@ const ViewIssue = ({
 
     return <View style={styles.container}>
         { issueDownloadStatus === FILE_RETRIEVAL_STATUS.COMPLETED &&
-            <ImageListViewer
+            <ImageListZoomViewer
                 navigation={navigation}
                 resourceName={resourceName}
                 resourceType={resourceType} />

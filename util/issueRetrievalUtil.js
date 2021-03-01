@@ -9,9 +9,9 @@ import {
 } from '../util/fileRetrievalUtil';
 
 export const issueIsIncludedInDownloads = (resourceName, resourceType, downloadProgressMap, canceledIssues) => {
-    console.log("check if issue is included in downloads list");
+    // console.log("check if issue is included in downloads list");
     if (canceledIssues.findIndex(i => i.resourceName === resourceName && i.resourceType === resourceType) !== -1) {
-        console.log("issue is cancelled");
+        // console.log("issue is cancelled");
         return false;
     }
     issueKey = resourceName + ":" + resourceType;
@@ -25,7 +25,7 @@ export const issueIsIncludedInDownloads = (resourceName, resourceType, downloadP
 
 export const isIssueCanceled = (resourceName, resourceType, canceledIssues) => {
     if (canceledIssues.findIndex(i => i.resourceName === resourceName && i.resourceType === resourceType) !== -1) {
-        console.log("issue is cancelled");
+        // console.log("issue is cancelled");
         return true
     }
     return false;
@@ -37,7 +37,7 @@ const getTotalPages = (issue, resourceType) =>
         : issue.total_pages;
 
 export const getIssueDownloadProgress = (state, action) => {
-    console.log("get issue download progress", action);
+    // console.log("get issue download progress", action);
     let { resourceName, resourceType } = action.payload;
     let { canceledIssues, fileCacheMap, issueList } = state;
     let issueIndex = issueList.issues.findIndex(i => i.upload_timestamp === resourceName);
@@ -58,7 +58,7 @@ export const getIssueDownloadProgress = (state, action) => {
 }
 
 export const getIssueDownloadStatus = (state, action) => {
-    console.log("get issue download status", action);
+    // console.log("get issue download status", action);
     let { resourceName, resourceType } = action.payload;
     let { canceledIssues, fileCacheMap, issueList } = state;
     let issueIndex = issueList.issues.findIndex(i => i.upload_timestamp === resourceName);
