@@ -98,7 +98,7 @@ const ImageListZoomViewer = ({ fileCacheMap, navigation, orientation, resourceNa
         navigation && navigation.navigate && navigation.navigate('RootTabNavigator');
     }
 
-    const imageZoomWidth = orientation === ORIENTATIONS.LANDSCAPE ? screenWidth - 100 : screenWidth;
+    const imageZoomWidth = screenWidth;
     const imageZoomHeight = screenHeight;
 
     return <View style={styles.container}>
