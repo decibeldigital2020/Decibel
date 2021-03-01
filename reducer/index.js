@@ -257,6 +257,7 @@ const reducer = (state = initialState, action) => {
             }
         }
         case "REMOVE_FILE_CACHE": {
+            // Has a side-effect of removing the downloadProgress entry for the whole issue/type
             newState.fileCacheMap = Object.assign({}, newState.fileCacheMap);
             delete newState.fileCacheMap[action.payload.filename];
             newState.downloadProgressMap = Object.assign({}, newState.downloadProgressMap);

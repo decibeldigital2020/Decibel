@@ -1,4 +1,5 @@
 import { 
+    FILE_RETRIEVAL_STATUS,
     RESOURCE_TYPE, 
     NUMBER_OF_PREVIEW_PAGES
 } from '../constants';
@@ -78,4 +79,33 @@ export const removeIssuePreview = (resourceName) => dispatch => {
     for (let i = 0; i < NUMBER_OF_PREVIEW_PAGES; i++) {
         dispatch(removeResource(getPreviewImageFilename(resourceName, i), resourceName, RESOURCE_TYPE.PREVIEW_IMG));
     }
+}
+
+export const resetIssueFailedStatus = (issue, resourceType) => async (dispatch, getState) => {
+    let resourceName = issue.upload_timestamp;
+    let state = getState();
+    let fileCacheMap = state.fileCacheMap;
+    await Object.keys(fileCacheMap)
+        .map(filename => {
+            let entry = {...fileCacheMap[filename]};
+            entry.filename = filename;
+            return entry;
+        })
+        .filter(entry => 
+            entry.status === FILE_RETRIEVAL_STATUS.FAILED
+                && entry.filename.includes(resourceName)
+                && entry.filename.includes(resourceType === RESOURCE_TYPE.PREVIEW_IMG
+                    ? "preview"
+                    : "issue")
+        )
+        .forEach(async entry => {
+            await dispatch({
+                type: "REMOVE_FILE_CACHE",
+                payload: {
+                    filename: entry.filename,
+                    resourceName,
+                    resourceName
+                }
+            })
+        });
 }

@@ -143,32 +143,6 @@ const ImageListZoomViewer = ({ fileCacheMap, navigation, orientation, resourceNa
                         style={imageViewStyle}
                     />
                 </TouchableOpacity>
-                // <Image 
-                //         height={height}
-                //         width={width}
-                //         source={{ uri: item }}
-                //         style={imageViewStyle}
-                //     />
-                // <ImageZoom
-                //     cropWidth={width}
-                //     cropHeight={height}
-                //     imageWidth={width}
-                //     imageHeight={height}
-                //     onLongPress={() => setMenuOpen(!menuOpen)}
-                //     style={styles.imageZoom}
-                //     >
-                //     <TouchableOpacity 
-                //         style={imageViewStyle} 
-                //         activeOpacity={1} 
-                //         onLongPress={() => setMenuOpen(!menuOpen)}>
-                //         <Image 
-                //             height={height}
-                //             width={width}
-                //             source={{ uri: item }}
-                //             style={imageViewStyle}
-                //         />
-                //     </TouchableOpacity>
-                // </ImageZoom>
             }
         />
         </ImageZoom>

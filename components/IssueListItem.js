@@ -22,7 +22,8 @@ import {
 import { styleConstants } from '../constants/styles';
 import { 
     getIssue as getIssueAction,
-    removeIssue as removeIssueAction 
+    removeIssue as removeIssueAction,
+    resetIssueFailedStatus as resetIssueFailedStatusAction
 } from '../actions/issueRetrievalActions';
 import {
     getStatusFromProgressMap
@@ -41,6 +42,7 @@ const IssueListItem = ({
     navigation, 
     product,
     requestNewPurchase,
+    resetIssueFailedStatus,
     removeIssue, 
     selectIssue 
 }) => {
@@ -144,8 +146,9 @@ const IssueListItem = ({
                         <View style={styles.actionButton}>
                             <Button 
                                 color={styleConstants.button.color}
-                                title={"Failed - Retry?"}
-                                onPress={() => {
+                                title={"Stopped - Resume?"}
+                                onPress={async () => {
+                                    await resetIssueFailedStatus(issue, RESOURCE_TYPE.ISSUE_IMG);
                                     getIssue(issue);
                                 }}
                             />
@@ -382,6 +385,7 @@ const mapDispatchToProps = () => dispatch => ({
     getIssue: (issue, resourceType) => dispatch(getIssueAction(issue, resourceType)),
     removeIssue: (resourceName, totalPages) => dispatch(removeIssueAction(resourceName, totalPages)),
     requestNewPurchase: (sku) => dispatch(requestNewPurchaseAction(sku)),
+    resetIssueFailedStatus: (issue, resourceType) => dispatch(resetIssueFailedStatusAction(issue, resourceType)),
     selectIssue: (productId) => dispatch({ type: "SELECT_ISSUE", payload: { productId }})
 });
 
