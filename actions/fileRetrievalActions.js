@@ -33,8 +33,12 @@ const getFilePath = (filename) => (RNFetchBlob.fs.dirs.DocumentDir + "/" + filen
 
 const fetchResource = (dispatch, filename, url, resourceName, resourceType) => {
     // console.log(`fetching ${filename} from ${url}`)
+    let rnFetchBlobConfig = {
+        IOSBackgroundTask: true,
+        path : getFilePath(filename)
+    };
     let dirs = RNFetchBlob.fs.dirs;
-    let task = RNFetchBlob.config({ path : getFilePath(filename) }).fetch('GET', url);
+    let task = RNFetchBlob.config(rnFetchBlobConfig).fetch('GET', url);
     dispatch({ type: "REQUEST_FILE_CACHE", payload: { filename, task, resourceName, resourceType } });
     return task.progress({ count : PROGRESS_FACTOR }, (received, total) => {
         // console.log('progress', received / total);
